@@ -20,14 +20,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_DXVA_INTERNAL_H
-#define AVCODEC_DXVA_INTERNAL_H
+#ifndef AVCODEC_D3D11VA_INTERNAL_H
+#define AVCODEC_D3D11VA_INTERNAL_H
 
 #define COBJMACROS
 
 #include "config.h"
 
-#include "dxva2.h"
+#include "d3d11va.h"
 #if HAVE_DXVA_H
 #include <dxva.h>
 #endif
@@ -35,22 +35,22 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 
-void *ff_dxva2_get_surface(const AVFrame *frame);
+void *ff_d3d11va_get_surface(const AVFrame *frame);
 
-unsigned ff_dxva2_get_surface_index(const struct dxva_context *,
+unsigned ff_d3d11va_get_surface_index(const struct d3d11va_context *,
                                     const AVFrame *frame);
 
-int ff_dxva2_commit_buffer(AVCodecContext *, struct dxva_context *,
-                           DXVA2_DecodeBufferDesc *,
-                           unsigned type, const void *data, unsigned size,
+int ff_d3d11va_commit_buffer(AVCodecContext *, struct d3d11va_context *,
+                           D3D11_VIDEO_DECODER_BUFFER_DESC *,
+                           D3D11_VIDEO_DECODER_BUFFER_TYPE type, const void *data, unsigned size,
                            unsigned mb_count);
 
 
-int ff_dxva2_common_end_frame(AVCodecContext *, AVFrame *,
+int ff_d3d11va_common_end_frame(AVCodecContext *, AVFrame *,
                               const void *pp, unsigned pp_size,
                               const void *qm, unsigned qm_size,
                               int (*commit_bs_si)(AVCodecContext *,
-                                                  DXVA2_DecodeBufferDesc *bs,
-                                                  DXVA2_DecodeBufferDesc *slice));
+                                                  D3D11_VIDEO_DECODER_BUFFER_DESC *bs,
+                                                  D3D11_VIDEO_DECODER_BUFFER_DESC *slice));
 
-#endif /* AVCODEC_DXVA_INTERNAL_H */
+#endif /* AVCODEC_D3D11VA_INTERNAL_H */

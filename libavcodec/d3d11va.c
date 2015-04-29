@@ -1,5 +1,5 @@
 /*
- * DXVA2 HW acceleration.
+ * Direct3D11 HW acceleration.
  *
  * copyright (c) 2010 Laurent Aimar
  *
@@ -28,17 +28,17 @@
 
 #include "avcodec.h"
 #include "mpegvideo.h"
-#include "dxva2_internal.h"
+#include "d3d11va_internal.h"
 
-void *ff_dxva2_get_surface(const AVFrame *frame)
+void *ff_d3d11va_get_surface(const AVFrame *frame)
 {
     return frame->data[3];
 }
 
-unsigned ff_dxva2_get_surface_index(const struct dxva_context *ctx,
+unsigned ff_d3d11va_get_surface_index(const struct d3d11va_context *ctx,
                                     const AVFrame *frame)
 {
-    void *surface = ff_dxva2_get_surface(frame);
+    void *surface = ff_d3d11va_get_surface(frame);
     unsigned i;
 
     for (i = 0; i < ctx->surface_count; i++)
@@ -49,19 +49,20 @@ unsigned ff_dxva2_get_surface_index(const struct dxva_context *ctx,
     return 0;
 }
 
-int ff_dxva2_commit_buffer(AVCodecContext *avctx,
-                           struct dxva_context *ctx,
-                           DXVA2_DecodeBufferDesc *dsc,
-                           unsigned type, const void *data, unsigned size,
-                           unsigned mb_count)
+int ff_d3d11va_commit_buffer(AVCodecContext *avctx,
+                             struct d3d11va_context *ctx,
+                             D3D11_VIDEO_DECODER_BUFFER_DESC *dsc,
+                             D3D11_VIDEO_DECODER_BUFFER_TYPE type,
+                             const void *data, unsigned size,
+                             unsigned mb_count)
 {
     void     *dxva_data;
     unsigned dxva_size;
     int      result;
     HRESULT hr;
 
-    hr = IDirectXVideoDecoder_GetBuffer(ctx->decoder, type,
-                                        &dxva_data, &dxva_size);
+    hr = ID3D11VideoContext_GetDecoderBuffer(ctx->video_context, ctx->decoder, type,
+                                        &dxva_size, &dxva_data);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR, "Failed to get a buffer for %u: 0x%lx\n",
                type, hr);
@@ -71,7 +72,7 @@ int ff_dxva2_commit_buffer(AVCodecContext *avctx,
         memcpy(dxva_data, data, size);
 
         memset(dsc, 0, sizeof(*dsc));
-        dsc->CompressedBufferType = type;
+        dsc->BufferType           = type;
         dsc->DataSize             = size;
         dsc->NumMBsInBuffer       = mb_count;
 
@@ -81,7 +82,7 @@ int ff_dxva2_commit_buffer(AVCodecContext *avctx,
         result = -1;
     }
 
-    hr = IDirectXVideoDecoder_ReleaseBuffer(ctx->decoder, type);
+    hr = ID3D11VideoContext_ReleaseDecoderBuffer(ctx->video_context, ctx->decoder, type);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR,
                "Failed to release buffer type %u: 0x%lx\n",
@@ -91,24 +92,23 @@ int ff_dxva2_commit_buffer(AVCodecContext *avctx,
     return result;
 }
 
-int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
+int ff_d3d11va_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
                               const void *pp, unsigned pp_size,
                               const void *qm, unsigned qm_size,
                               int (*commit_bs_si)(AVCodecContext *,
-                                                  DXVA2_DecodeBufferDesc *bs,
-                                                  DXVA2_DecodeBufferDesc *slice))
+                                                  D3D11_VIDEO_DECODER_BUFFER_DESC *bs,
+                                                  D3D11_VIDEO_DECODER_BUFFER_DESC *slice))
 {
-    struct dxva_context *ctx = avctx->hwaccel_context;
+    struct d3d11va_context *ctx = avctx->hwaccel_context;
     unsigned               buffer_count = 0;
-    DXVA2_DecodeBufferDesc buffer[4];
-    DXVA2_DecodeExecuteParams exec = { 0 };
+    D3D11_VIDEO_DECODER_BUFFER_DESC buffer[4];
     int result, runs = 0;
     HRESULT hr;
 
     do {
-        hr = IDirectXVideoDecoder_BeginFrame(ctx->decoder,
-                                             ff_dxva2_get_surface(frame),
-                                             NULL);
+        hr = ID3D11VideoContext_DecoderBeginFrame(ctx->video_context, ctx->decoder,
+                                             ff_d3d11va_get_surface(frame),
+                                             0, NULL);
         if (hr == E_PENDING)
             av_usleep(2000);
     } while (hr == E_PENDING && ++runs < 50);
@@ -118,8 +118,8 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
         return -1;
     }
 
-    result = ff_dxva2_commit_buffer(avctx, ctx, &buffer[buffer_count],
-                                    DXVA2_PictureParametersBufferType,
+    result = ff_d3d11va_commit_buffer(avctx, ctx, &buffer[buffer_count],
+                                    D3D11_VIDEO_DECODER_BUFFER_PICTURE_PARAMETERS,
                                     pp, pp_size, 0);
     if (result) {
         av_log(avctx, AV_LOG_ERROR,
@@ -129,8 +129,8 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
     buffer_count++;
 
     if (qm_size > 0) {
-        result = ff_dxva2_commit_buffer(avctx, ctx, &buffer[buffer_count],
-                                        DXVA2_InverseQuantizationMatrixBufferType,
+        result = ff_d3d11va_commit_buffer(avctx, ctx, &buffer[buffer_count],
+                                        D3D11_VIDEO_DECODER_BUFFER_INVERSE_QUANTIZATION_MATRIX,
                                         qm, qm_size, 0);
         if (result) {
             av_log(avctx, AV_LOG_ERROR,
@@ -154,17 +154,14 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
 
     assert(buffer_count == 1 + (qm_size > 0) + 2);
 
-    exec.NumCompBuffers      = buffer_count;
-    exec.pCompressedBuffers  = buffer;
-    exec.pExtensionData      = NULL;
-    hr = IDirectXVideoDecoder_Execute(ctx->decoder, &exec);
+    hr = ID3D11VideoContext_SubmitDecoderBuffers(ctx->video_context, ctx->decoder, buffer_count, buffer);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR, "Failed to execute: 0x%lx\n", hr);
         result = -1;
     }
 
 end:
-    hr = IDirectXVideoDecoder_EndFrame(ctx->decoder, NULL);
+    hr = ID3D11VideoContext_DecoderEndFrame(ctx->video_context, ctx->decoder);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR, "Failed to end frame: 0x%lx\n", hr);
         result = -1;
