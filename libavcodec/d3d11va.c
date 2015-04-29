@@ -30,15 +30,15 @@
 #include "mpegvideo.h"
 #include "d3d11va_internal.h"
 
-ID3D11Texture2D *ff_d3d11va_get_surface(const AVFrame *frame)
+ID3D11VideoDecoderOutputView *ff_d3d11va_get_surface(const AVFrame *frame)
 {
-    return frame->data[3];
+    return (ID3D11VideoDecoderOutputView*) frame->data[3];
 }
 
 unsigned ff_d3d11va_get_surface_index(const struct d3d11va_context *ctx,
                                     const AVFrame *frame)
 {
-    ID3D11Texture2D *surface = ff_d3d11va_get_surface(frame);
+    ID3D11VideoDecoderOutputView *surface = ff_d3d11va_get_surface(frame);
     unsigned i;
 
     for (i = 0; i < ctx->surface_count; i++)

@@ -35,7 +35,7 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 
-ID3D11Texture2D *ff_d3d11va_get_surface(const AVFrame *frame);
+ID3D11VideoDecoderOutputView *ff_d3d11va_get_surface(const AVFrame *frame);
 
 unsigned ff_d3d11va_get_surface_index(const struct d3d11va_context *,
                                     const AVFrame *frame);

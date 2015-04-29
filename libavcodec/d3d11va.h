@@ -77,7 +77,7 @@ struct d3d11va_context {
     /**
      * The array of Direct3D surfaces used to create the decoder
      */
-    ID3D11Texture2D **surface;
+    ID3D11VideoDecoderOutputView **surface;
 
     /**
      * A bit field configuring the workarounds needed for using the decoder
