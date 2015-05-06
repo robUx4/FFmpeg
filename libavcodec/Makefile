@@ -876,8 +876,8 @@ SKIPHEADERS                            += %_tablegen.h                  \
                                           tableprint_vlc.h              \
                                           $(ARCH)/vp56_arith.h          \
 
-SKIPHEADERS-$(CONFIG_DXVA2)            += dxva2.h dxva2_internal.h
-SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h d3d11va_internal.h
+SKIPHEADERS-$(CONFIG_DXVA2)            += dxva2.h dxva2_internal.h dxva_internal.h
+SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h d3d11va_internal.h dxva_internal.h
 SKIPHEADERS-$(CONFIG_LIBSCHROEDINGER)  += libschroedinger.h
 SKIPHEADERS-$(CONFIG_LIBUTVIDEO)       += libutvideo.h
 SKIPHEADERS-$(CONFIG_QSV)              += qsv.h qsv_internal.h
