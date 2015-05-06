@@ -29,15 +29,15 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 
-dxva_surface *ff_dxva_get_surface(const AVFrame *frame)
+dxva_surface *ff_dxva2_get_surface(const AVFrame *frame)
 {
     return (dxva_surface*) frame->data[3];
 }
 
-unsigned ff_dxva_get_surface_index(const struct dxva_context *ctx,
+unsigned ff_dxva2_get_surface_index(const struct dxva_context *ctx,
                                     const AVFrame *frame)
 {
-    dxva_surface *surface = ff_dxva_get_surface(frame);
+    dxva_surface *surface = ff_dxva2_get_surface(frame);
     unsigned i;
 
     for (i = 0; i < ctx->surface_count; i++)
@@ -48,7 +48,7 @@ unsigned ff_dxva_get_surface_index(const struct dxva_context *ctx,
     return 0;
 }
 
-int ff_dxva_commit_buffer(AVCodecContext *avctx,
+int ff_dxva2_commit_buffer(AVCodecContext *avctx,
                            struct dxva_context *ctx,
                            dxva_buffer_desc *dsc,
                            dxva_buffer_type type, const void *data, unsigned size,
@@ -89,7 +89,7 @@ int ff_dxva_commit_buffer(AVCodecContext *avctx,
     return result;
 }
 
-int ff_dxva_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
+int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
                               const void *pp, unsigned pp_size,
                               const void *qm, unsigned qm_size,
                               int (*commit_bs_si)(AVCodecContext *,
@@ -100,11 +100,10 @@ int ff_dxva_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
     unsigned               buffer_count = 0;
     dxva_buffer_desc buffer[4];
     int result, runs = 0;
-    dxva_surface *surface = ff_dxva_get_surface(frame);
     HRESULT hr;
 
     do {
-        hr = dxva_begin_frame(ctx, surface);
+        hr = dxva_begin_frame(ctx, ff_dxva2_get_surface(frame));
         if (hr == E_PENDING)
             av_usleep(2000);
     } while (hr == E_PENDING && ++runs < 50);
@@ -114,7 +113,7 @@ int ff_dxva_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
         return -1;
     }
 
-    result = ff_dxva_commit_buffer(avctx, ctx, &buffer[buffer_count],
+    result = ff_dxva2_commit_buffer(avctx, ctx, &buffer[buffer_count],
                                     dxva_buftype_PictureParams,
                                     pp, pp_size, 0);
     if (result) {
@@ -125,7 +124,7 @@ int ff_dxva_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
     buffer_count++;
 
     if (qm_size > 0) {
-        result = ff_dxva_commit_buffer(avctx, ctx, &buffer[buffer_count],
+        result = ff_dxva2_commit_buffer(avctx, ctx, &buffer[buffer_count],
                                         dxva_buftype_IQuantizationMatrix,
                                         qm, qm_size, 0);
         if (result) {

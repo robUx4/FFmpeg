@@ -28,18 +28,18 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 
-dxva_surface *ff_dxva_get_surface(const AVFrame *frame);
+dxva_surface *ff_dxva2_get_surface(const AVFrame *frame);
 
-unsigned ff_dxva_get_surface_index(const struct dxva_context *,
+unsigned ff_dxva2_get_surface_index(const struct dxva_context *,
                                     const AVFrame *frame);
 
-int ff_dxva_commit_buffer(AVCodecContext *, struct dxva_context *,
+int ff_dxva2_commit_buffer(AVCodecContext *, struct dxva_context *,
                            dxva_buffer_desc *,
                            dxva_buffer_type type, const void *data, unsigned size,
                            unsigned mb_count);
 
 
-int ff_dxva_common_end_frame(AVCodecContext *, AVFrame *,
+int ff_dxva2_common_end_frame(AVCodecContext *, AVFrame *,
                               const void *pp, unsigned pp_size,
                               const void *qm, unsigned qm_size,
                               int (*commit_bs_si)(AVCodecContext *,

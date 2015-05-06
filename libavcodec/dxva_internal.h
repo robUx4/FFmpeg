@@ -55,11 +55,6 @@ static inline HRESULT dxva_submit_buffer(struct dxva_context *ctx, dxva_buffer_d
 
 #define dxva_set_buffer_type(dsc, type)   dsc->CompressedBufferType = type
 
-#define ff_dxva_get_surface(f)                        ff_dxva2_get_surface(f)
-#define ff_dxva_get_surface_index(c, f)               ff_dxva2_get_surface_index(c, f)
-#define ff_dxva_commit_buffer(ctx,dc,d,t,p,ps,c)      ff_dxva2_commit_buffer(ctx,dc,d,t,p,ps,c)
-#define ff_dxva_common_end_frame(ctx,f,p,ps,q,qs,cb)  ff_dxva2_common_end_frame(ctx,f,p,ps,q,qs,cb)
-
 #include "dxva2_internal.h"
 
 #endif /* AVCODEC_DXVA_INTERNAL_H */

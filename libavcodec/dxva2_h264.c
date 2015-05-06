@@ -50,7 +50,7 @@ static void fill_picture_parameters(struct dxva_context *ctx, const H264Context 
     memset(pp, 0, sizeof(*pp));
     /* Configure current picture */
     fill_picture_entry(&pp->CurrPic,
-                       ff_dxva_get_surface_index(ctx, &current_picture->f),
+                       ff_dxva2_get_surface_index(ctx, &current_picture->f),
                        h->picture_structure == PICT_BOTTOM_FIELD);
     /* Configure the set of references */
     pp->UsedForReferenceFlags  = 0;
@@ -66,7 +66,7 @@ static void fill_picture_parameters(struct dxva_context *ctx, const H264Context 
         }
         if (r) {
             fill_picture_entry(&pp->RefFrameList[i],
-                               ff_dxva_get_surface_index(ctx, &r->f),
+                               ff_dxva2_get_surface_index(ctx, &r->f),
                                r->long_ref != 0);
 
             if ((r->reference & PICT_TOP_FIELD) && r->field_poc[0] != INT_MAX)
@@ -243,9 +243,9 @@ static void fill_slice_long(AVCodecContext *avctx, DXVA_Slice_H264_Long *slice,
                 unsigned plane;
                 unsigned index;
                 if (ctx->workaround & FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO)
-                    index = ff_dxva_get_surface_index(ctx, &r->f);
+                    index = ff_dxva2_get_surface_index(ctx, &r->f);
                 else
-                    index = get_refpic_index(pp, ff_dxva_get_surface_index(ctx, &r->f));
+                    index = get_refpic_index(pp, ff_dxva2_get_surface_index(ctx, &r->f));
                 fill_picture_entry(&slice->RefPicList[list][i], index,
                                    r->reference == PICT_BOTTOM_FIELD);
                 for (plane = 0; plane < 3; plane++) {
@@ -379,7 +379,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
         slice_size = ctx_pic->slice_count * sizeof(*ctx_pic->slice_long);
     }
     assert((bs->DataSize & 127) == 0);
-    return ff_dxva_commit_buffer(avctx, ctx, sc,
+    return ff_dxva2_commit_buffer(avctx, ctx, sc,
                                   dxva_buftype_SliceControl,
                                   slice_data, slice_size, mb_count);
 }
@@ -451,7 +451,7 @@ static int dxva2_h264_end_frame(AVCodecContext *avctx)
 
     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
         return -1;
-    ret = ff_dxva_common_end_frame(avctx, &h->cur_pic_ptr->f,
+    ret = ff_dxva2_common_end_frame(avctx, &h->cur_pic_ptr->f,
                                     &ctx_pic->pp, sizeof(ctx_pic->pp),
                                     &ctx_pic->qm, sizeof(ctx_pic->qm),
                                     commit_bitstream_and_slice_buffer);

@@ -72,7 +72,7 @@ static void fill_picture_parameters(struct dxva_context *ctx, const HEVCContext 
                                       (0                                  << 14) |
                                       (0                                  << 15);
 
-    fill_picture_entry(&pp->CurrPic, ff_dxva_get_surface_index(ctx, current_picture->frame), 0);
+    fill_picture_entry(&pp->CurrPic, ff_dxva2_get_surface_index(ctx, current_picture->frame), 0);
 
     pp->sps_max_dec_pic_buffering_minus1         = h->sps->temporal_layer[h->sps->max_sub_layers - 1].max_dec_pic_buffering - 1;
     pp->log2_min_luma_coding_block_size_minus3   = h->sps->log2_min_cb_size - 3;
@@ -164,7 +164,7 @@ static void fill_picture_parameters(struct dxva_context *ctx, const HEVCContext 
     for (i = 0, j = 0; i < FF_ARRAY_ELEMS(h->DPB); i++) {
         const HEVCFrame *frame = &h->DPB[i];
         if (frame != current_picture && (frame->flags & (HEVC_FRAME_FLAG_LONG_REF | HEVC_FRAME_FLAG_SHORT_REF))) {
-            fill_picture_entry(&pp->RefPicList[j], ff_dxva_get_surface_index(ctx, frame->frame), !!(frame->flags & HEVC_FRAME_FLAG_LONG_REF));
+            fill_picture_entry(&pp->RefPicList[j], ff_dxva2_get_surface_index(ctx, frame->frame), !!(frame->flags & HEVC_FRAME_FLAG_LONG_REF));
             pp->PicOrderCntValList[j] = frame->poc;
             j++;
         }
@@ -175,7 +175,7 @@ static void fill_picture_parameters(struct dxva_context *ctx, const HEVCContext 
         av_assert0(rpl->nb_refs <= FF_ARRAY_ELEMS(pp->ref_list)); \
         for (j = 0, k = 0; j < rpl->nb_refs; j++) { \
             if (rpl->ref[j]) { \
-                pp->ref_list[k] = get_refpic_index(pp, ff_dxva_get_surface_index(ctx, rpl->ref[j]->frame)); \
+                pp->ref_list[k] = get_refpic_index(pp, ff_dxva2_get_surface_index(ctx, rpl->ref[j]->frame)); \
                 k++; \
             } \
         } \
@@ -296,7 +296,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     slice_size = ctx_pic->slice_count * sizeof(*ctx_pic->slice_short);
 
     av_assert0((bs->DataSize & 127) == 0);
-    return ff_dxva_commit_buffer(avctx, ctx, sc,
+    return ff_dxva2_commit_buffer(avctx, ctx, sc,
                                   dxva_buftype_SliceControl,
                                   slice_data, slice_size, 0);
 }
@@ -359,7 +359,7 @@ static int dxva2_hevc_end_frame(AVCodecContext *avctx)
     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
         return -1;
 
-    ret = ff_dxva_common_end_frame(avctx, h->ref->frame,
+    ret = ff_dxva2_common_end_frame(avctx, h->ref->frame,
                                     &ctx_pic->pp, sizeof(ctx_pic->pp),
                                     scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0,
                                     commit_bitstream_and_slice_buffer);

@@ -46,10 +46,10 @@
 
 #define dxva_set_buffer_type(dsc, type)   dsc->BufferType = type
 
-#define ff_dxva_get_surface(f)                        ff_d3d11va_get_surface(f)
-#define ff_dxva_get_surface_index(c, f)               ff_d3d11va_get_surface_index(c, f)
-#define ff_dxva_commit_buffer(ctx,dc,d,t,p,ps,c)      ff_d3d11va_commit_buffer(ctx,dc,d,t,p,ps,c)
-#define ff_dxva_common_end_frame(ctx,f,p,ps,q,qs,cb)  ff_d3d11va_common_end_frame(ctx,f,p,ps,q,qs,cb)
+#define ff_dxva2_get_surface(f)                        ff_d3d11va_get_surface(f)
+#define ff_dxva2_get_surface_index(c, f)               ff_d3d11va_get_surface_index(c, f)
+#define ff_dxva2_commit_buffer(ctx,dc,d,t,p,ps,c)      ff_d3d11va_commit_buffer(ctx,dc,d,t,p,ps,c)
+#define ff_dxva2_common_end_frame(ctx,f,p,ps,q,qs,cb)  ff_d3d11va_common_end_frame(ctx,f,p,ps,q,qs,cb)
 
 #include "dxva2_internal.h"
 
