@@ -5,8 +5,8 @@ NAME = avcodec
 HEADERS = avcodec.h                                                     \
           avfft.h                                                       \
           dv_profile.h                                                  \
+          d3d11va.h                                                     \
           dxva2.h                                                       \
-          d3d11va.h                                                       \
           old_codec_ids.h                                               \
           qsv.h                                                         \
           vaapi.h                                                       \
@@ -671,32 +671,32 @@ OBJS-$(CONFIG_ADPCM_YAMAHA_ENCODER)       += adpcmenc.o adpcm_data.o
 OBJS-$(CONFIG_VIMA_DECODER)               += vima.o adpcm_data.o
 
 # hardware accelerators
-OBJS-$(CONFIG_DXVA2)                      += dxva.o
 OBJS-$(CONFIG_D3D11VA)                    += d3d11va.o
+OBJS-$(CONFIG_DXVA2)                      += dxva2.o
 OBJS-$(CONFIG_VAAPI)                      += vaapi.o
 OBJS-$(CONFIG_VDA)                        += vda.o
 OBJS-$(CONFIG_VDPAU)                      += vdpau.o
 
 OBJS-$(CONFIG_H263_VAAPI_HWACCEL)         += vaapi_mpeg4.o
 OBJS-$(CONFIG_H263_VDPAU_HWACCEL)         += vdpau_mpeg4.o
-OBJS-$(CONFIG_H264_DXVA2_HWACCEL)         += dxva_h264.o
 OBJS-$(CONFIG_H264_D3D11VA_HWACCEL)       += d3d11va_h264.o
+OBJS-$(CONFIG_H264_DXVA2_HWACCEL)         += dxva2_h264.o
 OBJS-$(CONFIG_H264_VAAPI_HWACCEL)         += vaapi_h264.o
 OBJS-$(CONFIG_H264_VDA_HWACCEL)           += vda_h264.o
 OBJS-$(CONFIG_H264_VDPAU_HWACCEL)         += vdpau_h264.o
-OBJS-$(CONFIG_HEVC_DXVA2_HWACCEL)         += dxva_hevc.o
 OBJS-$(CONFIG_HEVC_D3D11VA_HWACCEL)       += d3d11va_hevc.o
+OBJS-$(CONFIG_HEVC_DXVA2_HWACCEL)         += dxva2_hevc.o
 OBJS-$(CONFIG_MPEG1_VDPAU_HWACCEL)        += vdpau_mpeg12.o
 OBJS-$(CONFIG_MPEG1_XVMC_HWACCEL)         += mpegvideo_xvmc.o
-OBJS-$(CONFIG_MPEG2_DXVA2_HWACCEL)        += dxva_mpeg2.o
 OBJS-$(CONFIG_MPEG2_D3D11VA_HWACCEL)      += d3d11va_mpeg2.o
+OBJS-$(CONFIG_MPEG2_DXVA2_HWACCEL)        += dxva2_mpeg2.o
 OBJS-$(CONFIG_MPEG2_VAAPI_HWACCEL)        += vaapi_mpeg2.o
 OBJS-$(CONFIG_MPEG2_VDPAU_HWACCEL)        += vdpau_mpeg12.o
 OBJS-$(CONFIG_MPEG2_XVMC_HWACCEL)         += mpegvideo_xvmc.o
 OBJS-$(CONFIG_MPEG4_VAAPI_HWACCEL)        += vaapi_mpeg4.o
 OBJS-$(CONFIG_MPEG4_VDPAU_HWACCEL)        += vdpau_mpeg4.o
-OBJS-$(CONFIG_VC1_DXVA2_HWACCEL)          += dxva_vc1.o
 OBJS-$(CONFIG_VC1_D3D11VA_HWACCEL)        += d3d11va_vc1.o
+OBJS-$(CONFIG_VC1_DXVA2_HWACCEL)          += dxva2_vc1.o
 OBJS-$(CONFIG_VC1_VAAPI_HWACCEL)          += vaapi_vc1.o
 OBJS-$(CONFIG_VC1_VDPAU_HWACCEL)          += vdpau_vc1.o
 
@@ -876,8 +876,8 @@ SKIPHEADERS                            += %_tablegen.h                  \
                                           tableprint_vlc.h              \
                                           $(ARCH)/vp56_arith.h          \
 
-SKIPHEADERS-$(CONFIG_DXVA2)            += dxva.h dxva_internal.h dxva2_internal.h
-SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h d3d11va_internal.h dxva2_internal.h
+SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h d3d11va_internal.h dxva_internal_template.h
+SKIPHEADERS-$(CONFIG_DXVA2)            += dxva2.h dxva2_internal.h dxva_internal_template.h
 SKIPHEADERS-$(CONFIG_LIBSCHROEDINGER)  += libschroedinger.h
 SKIPHEADERS-$(CONFIG_LIBUTVIDEO)       += libutvideo.h
 SKIPHEADERS-$(CONFIG_QSV)              += qsv.h qsv_internal.h

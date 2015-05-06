@@ -54,7 +54,7 @@
  *
  * The application must make it available as AVCodecContext.hwaccel_context.
  */
-struct d3d11va_context {
+struct av_d3d11va_context {
     /**
      * D3D11 decoder object
      */

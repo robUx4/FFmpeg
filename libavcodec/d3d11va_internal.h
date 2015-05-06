@@ -29,7 +29,7 @@
 #include "d3d11va.h"
 #include <dxva.h>
 
-#define dxva_context                      d3d11va_context
+#define dxva_context                      av_d3d11va_context
 #define dxva_surface_t                    ID3D11VideoDecoderOutputView
 #define DECODER_BUFFER_DESC               D3D11_VIDEO_DECODER_BUFFER_DESC
 #define DECODER_BUFFER_TYPE               D3D11_VIDEO_DECODER_BUFFER_TYPE
@@ -51,6 +51,6 @@
 #define ff_dxva2_commit_buffer(ctx,dc,d,t,p,ps,c)      ff_d3d11va_commit_buffer(ctx,dc,d,t,p,ps,c)
 #define ff_dxva2_common_end_frame(ctx,f,p,ps,q,qs,cb)  ff_d3d11va_common_end_frame(ctx,f,p,ps,q,qs,cb)
 
-#include "dxva2_internal.h"
+#include "dxva_internal_template.h"
 
 #endif /* AVCODEC_D3D11VA_INTERNAL_H */

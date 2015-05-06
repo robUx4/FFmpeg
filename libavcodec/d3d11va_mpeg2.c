@@ -27,7 +27,7 @@
 #define dxva2_mpeg2_decode_slice  d3d11va_mpeg2_decode_slice
 #define dxva2_mpeg2_end_frame     d3d11va_mpeg2_end_frame
 
-#include "dxva2_mpeg2.c"
+#include "dxva_mpeg2_template.c"
 
 AVHWAccel ff_mpeg2_d3d11va_hwaccel = {
     .name           = "mpeg2_d3d11va",

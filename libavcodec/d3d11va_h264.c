@@ -27,7 +27,7 @@
 #define dxva2_h264_decode_slice  d3d11va_h264_decode_slice
 #define dxva2_h264_end_frame     d3d11va_h264_end_frame
 
-#include "dxva2_h264.c"
+#include "dxva_h264_template.c"
 
 AVHWAccel ff_h264_d3d11va_hwaccel = {
     .name           = "h264_d3d11va",

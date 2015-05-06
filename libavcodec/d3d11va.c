@@ -21,4 +21,4 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 #include "d3d11va_internal.h"
-#include "dxva2.c"
+#include "dxva_template.c"
