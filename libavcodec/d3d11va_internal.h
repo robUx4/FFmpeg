@@ -1,7 +1,8 @@
 /*
- * DXVA2 HW acceleration
+ * Direct3D11 HW acceleration
  *
  * copyright (c) 2010 Laurent Aimar
+ * copyright (c) 2015 Steve Lhomme
  *
  * This file is part of FFmpeg.
  *
@@ -25,32 +26,31 @@
 
 #define COBJMACROS
 
-#include "config.h"
-
 #include "d3d11va.h"
-#if HAVE_DXVA_H
 #include <dxva.h>
-#endif
 
-#include "avcodec.h"
-#include "mpegvideo.h"
+#define dxva_context                      d3d11va_context
+#define dxva_surface                      ID3D11VideoDecoderOutputView
+#define dxva_buffer_desc                  D3D11_VIDEO_DECODER_BUFFER_DESC
+#define dxva_buffer_type                  D3D11_VIDEO_DECODER_BUFFER_TYPE
+#define dxva_get_buffer(ctx,t,b,s)        ID3D11VideoContext_GetDecoderBuffer(ctx->video_context, ctx->decoder, t,s,b)
+#define dxva_submit_buffer(ctx,b,c)       ID3D11VideoContext_SubmitDecoderBuffers(ctx->video_context, ctx->decoder, c,b)
+#define dxva_release_buffer(ctx,t)        ID3D11VideoContext_ReleaseDecoderBuffer(ctx->video_context, ctx->decoder, t)
+#define dxva_begin_frame(ctx,s)           ID3D11VideoContext_DecoderBeginFrame(ctx->video_context, ctx->decoder, s, 0, NULL)
+#define dxva_end_frame(ctx)               ID3D11VideoContext_DecoderEndFrame(ctx->video_context, ctx->decoder)
 
-ID3D11VideoDecoderOutputView *ff_d3d11va_get_surface(const AVFrame *frame);
+#define dxva_buftype_PictureParams        D3D11_VIDEO_DECODER_BUFFER_PICTURE_PARAMETERS
+#define dxva_buftype_IQuantizationMatrix  D3D11_VIDEO_DECODER_BUFFER_INVERSE_QUANTIZATION_MATRIX
+#define dxva_buftype_Bitstream            D3D11_VIDEO_DECODER_BUFFER_BITSTREAM
+#define dxva_buftype_SliceControl         D3D11_VIDEO_DECODER_BUFFER_SLICE_CONTROL
 
-unsigned ff_d3d11va_get_surface_index(const struct d3d11va_context *,
-                                    const AVFrame *frame);
+#define dxva_set_buffer_type(dsc, type)   dsc->BufferType = type
 
-int ff_d3d11va_commit_buffer(AVCodecContext *, struct d3d11va_context *,
-                           D3D11_VIDEO_DECODER_BUFFER_DESC *,
-                           D3D11_VIDEO_DECODER_BUFFER_TYPE type, const void *data, unsigned size,
-                           unsigned mb_count);
+#define ff_dxva_get_surface(f)                        ff_d3d11va_get_surface(f)
+#define ff_dxva_get_surface_index(c, f)               ff_d3d11va_get_surface_index(c, f)
+#define ff_dxva_commit_buffer(ctx,dc,d,t,p,ps,c)      ff_d3d11va_commit_buffer(ctx,dc,d,t,p,ps,c)
+#define ff_dxva_common_end_frame(ctx,f,p,ps,q,qs,cb)  ff_d3d11va_common_end_frame(ctx,f,p,ps,q,qs,cb)
 
-
-int ff_d3d11va_common_end_frame(AVCodecContext *, AVFrame *,
-                              const void *pp, unsigned pp_size,
-                              const void *qm, unsigned qm_size,
-                              int (*commit_bs_si)(AVCodecContext *,
-                                                  D3D11_VIDEO_DECODER_BUFFER_DESC *bs,
-                                                  D3D11_VIDEO_DECODER_BUFFER_DESC *slice));
+#include "dxva_internal.h"
 
 #endif /* AVCODEC_D3D11VA_INTERNAL_H */

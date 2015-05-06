@@ -2,6 +2,7 @@
  * Direct3D11 HW acceleration
  *
  * copyright (c) 2009 Laurent Aimar
+ * copyright (c) 2015 Steve Lhomme
  *
  * This file is part of FFmpeg.
  *
