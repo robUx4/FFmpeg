@@ -27,7 +27,7 @@
 #define dxva2_hevc_decode_slice  d3d11va_hevc_decode_slice
 #define dxva2_hevc_end_frame     d3d11va_hevc_end_frame
 
-#include "dxva_hevc.c"
+#include "dxva2_hevc.c"
 
 AVHWAccel ff_hevc_d3d11va_hwaccel = {
     .name           = "hevc_d3d11va",

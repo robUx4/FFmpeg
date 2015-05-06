@@ -51,6 +51,6 @@
 #define ff_dxva_commit_buffer(ctx,dc,d,t,p,ps,c)      ff_d3d11va_commit_buffer(ctx,dc,d,t,p,ps,c)
 #define ff_dxva_common_end_frame(ctx,f,p,ps,q,qs,cb)  ff_d3d11va_common_end_frame(ctx,f,p,ps,q,qs,cb)
 
-#include "dxva_internal.h"
+#include "dxva2_internal.h"
 
 #endif /* AVCODEC_D3D11VA_INTERNAL_H */

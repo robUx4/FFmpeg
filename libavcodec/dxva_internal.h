@@ -1,7 +1,8 @@
 /*
- * DXVA HW acceleration
+ * DXVA2 HW acceleration
  *
  * copyright (c) 2010 Laurent Aimar
+ * copyright (c) 2015 Steve Lhomme
  *
  * This file is part of FFmpeg.
  *
@@ -23,27 +24,42 @@
 #ifndef AVCODEC_DXVA_INTERNAL_H
 #define AVCODEC_DXVA_INTERNAL_H
 
-#include "config.h"
+#define COBJMACROS
 
-#include "avcodec.h"
-#include "mpegvideo.h"
+#include "dxva2.h"
+#include <dxva.h>
 
-dxva_surface *ff_dxva_get_surface(const AVFrame *frame);
+#define dxva_context                      dxva_context
+#define dxva_surface                      IDirect3DSurface9
+#define dxva_buffer_desc                  DXVA2_DecodeBufferDesc
+#define dxva_buffer_type                  unsigned
+#define dxva_get_buffer(ctx,t,b,s)        IDirectXVideoDecoder_GetBuffer(ctx->decoder, t,b,s)
 
-unsigned ff_dxva_get_surface_index(const struct dxva_context *,
-                                    const AVFrame *frame);
+static inline HRESULT dxva_submit_buffer(struct dxva_context *ctx, dxva_buffer_desc *buffer, unsigned buffer_count) {
+    DXVA2_DecodeExecuteParams exec = {
+        .pCompressedBuffers = buffer,
+        .NumCompBuffers = buffer_count,
+        .pExtensionData = NULL,
+    };
+    return IDirectXVideoDecoder_Execute(ctx->decoder, &exec);
+}
 
-int ff_dxva_commit_buffer(AVCodecContext *, struct dxva_context *,
-                           dxva_buffer_desc *,
-                           dxva_buffer_type type, const void *data, unsigned size,
-                           unsigned mb_count);
+#define dxva_release_buffer(ctx,t)        IDirectXVideoDecoder_ReleaseBuffer(ctx->decoder, t)
+#define dxva_begin_frame(ctx,s)           IDirectXVideoDecoder_BeginFrame(ctx->decoder, s, NULL)
+#define dxva_end_frame(ctx)               IDirectXVideoDecoder_EndFrame(ctx->decoder, NULL)
 
+#define dxva_buftype_PictureParams        DXVA2_PictureParametersBufferType
+#define dxva_buftype_IQuantizationMatrix  DXVA2_InverseQuantizationMatrixBufferType
+#define dxva_buftype_Bitstream            DXVA2_BitStreamDateBufferType
+#define dxva_buftype_SliceControl         DXVA2_SliceControlBufferType
 
-int ff_dxva_common_end_frame(AVCodecContext *, AVFrame *,
-                              const void *pp, unsigned pp_size,
-                              const void *qm, unsigned qm_size,
-                              int (*commit_bs_si)(AVCodecContext *,
-                                                  dxva_buffer_desc *bs,
-                                                  dxva_buffer_desc *slice));
+#define dxva_set_buffer_type(dsc, type)   dsc->CompressedBufferType = type
+
+#define ff_dxva_get_surface(f)                        ff_dxva2_get_surface(f)
+#define ff_dxva_get_surface_index(c, f)               ff_dxva2_get_surface_index(c, f)
+#define ff_dxva_commit_buffer(ctx,dc,d,t,p,ps,c)      ff_dxva2_commit_buffer(ctx,dc,d,t,p,ps,c)
+#define ff_dxva_common_end_frame(ctx,f,p,ps,q,qs,cb)  ff_dxva2_common_end_frame(ctx,f,p,ps,q,qs,cb)
+
+#include "dxva2_internal.h"
 
 #endif /* AVCODEC_DXVA_INTERNAL_H */

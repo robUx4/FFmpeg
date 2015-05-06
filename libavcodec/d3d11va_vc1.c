@@ -27,7 +27,7 @@
 #define dxva2_vc1_decode_slice  d3d11va_vc1_decode_slice
 #define dxva2_vc1_end_frame     d3d11va_vc1_end_frame
 
-#include "dxva_vc1.c"
+#include "dxva2_vc1.c"
 
 #if CONFIG_WMV3_D3D11VA_HWACCEL
 AVHWAccel ff_wmv3_d3d11va_hwaccel = {
