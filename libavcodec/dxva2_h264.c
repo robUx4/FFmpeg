@@ -288,8 +288,8 @@ static void fill_slice_long(AVCodecContext *avctx, DXVA_Slice_H264_Long *slice,
 }
 
 static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
-                                             dxva_buffer_desc *bs,
-                                             dxva_buffer_desc *sc)
+                                             DECODER_BUFFER_DESC *bs,
+                                             DECODER_BUFFER_DESC *sc)
 {
     const H264Context *h = avctx->priv_data;
     const unsigned mb_count = h->mb_width * h->mb_height;
@@ -306,8 +306,9 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     unsigned i;
 
     /* Create an annex B bitstream buffer with only slice NAL and finalize slice */
-    if (FAILED(dxva_get_buffer(ctx, dxva_buftype_Bitstream,
-	                           &dxva_data_ptr, &dxva_size)))
+    if (FAILED(DECODER_GET_BUFFER(ctx,
+	                              DECODER_BUFTYPE_BITSTREAM,
+	                              &dxva_data_ptr, &dxva_size)))
         return -1;
 
     dxva_data = dxva_data_ptr;
@@ -361,13 +362,13 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
 
         slice->SliceBytesInBuffer += padding;
     }
-    if (FAILED(dxva_release_buffer(ctx, dxva_buftype_Bitstream)))
+    if (FAILED(DECODER_RELEASE_BUFFER(ctx, DECODER_BUFTYPE_BITSTREAM)))
         return -1;
     if (i < ctx_pic->slice_count)
         return -1;
 
     memset(bs, 0, sizeof(*bs));
-    dxva_set_buffer_type(bs, dxva_buftype_Bitstream);
+    DECODER_BUFFER_DESC_SET_TYPE(bs, DECODER_BUFTYPE_BITSTREAM);
     bs->DataSize             = current - dxva_data;
     bs->NumMBsInBuffer       = mb_count;
 
@@ -380,7 +381,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     }
     assert((bs->DataSize & 127) == 0);
     return ff_dxva2_commit_buffer(avctx, ctx, sc,
-                                  dxva_buftype_SliceControl,
+                                  DECODER_BUFTYPE_SLICE_CONTROL,
                                   slice_data, slice_size, mb_count);
 }
 

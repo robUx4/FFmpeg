@@ -145,8 +145,8 @@ static void fill_slice(AVCodecContext *avctx,
     slice->wMBbitOffset        = 4 * 8 + get_bits_count(&gb);
 }
 static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
-                                             dxva_buffer_desc *bs,
-                                             dxva_buffer_desc *sc)
+                                             DECODER_BUFFER_DESC *bs,
+                                             DECODER_BUFFER_DESC *sc)
 {
     const struct MpegEncContext *s = avctx->priv_data;
     struct dxva_context *ctx = avctx->hwaccel_context;
@@ -159,8 +159,9 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     unsigned dxva_size;
     unsigned i;
 
-    if (FAILED(dxva_get_buffer(ctx, dxva_buftype_Bitstream,
-                               &dxva_data_ptr, &dxva_size)))
+    if (FAILED(DECODER_GET_BUFFER(ctx,
+	                              DECODER_BUFTYPE_BITSTREAM,
+                                  &dxva_data_ptr, &dxva_size)))
         return -1;
 
     dxva_data = dxva_data_ptr;
@@ -187,18 +188,18 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
         memcpy(current, &ctx_pic->bitstream[position], size);
         current += size;
     }
-    if (FAILED(dxva_release_buffer(ctx, dxva_buftype_Bitstream)))
+    if (FAILED(DECODER_RELEASE_BUFFER(ctx, DECODER_BUFTYPE_BITSTREAM)))
         return -1;
     if (i < ctx_pic->slice_count)
         return -1;
 
     memset(bs, 0, sizeof(*bs));
-    dxva_set_buffer_type(bs, dxva_buftype_Bitstream);
+    DECODER_BUFFER_DESC_SET_TYPE(bs, DECODER_BUFTYPE_BITSTREAM);
     bs->DataSize             = current - dxva_data;
     bs->NumMBsInBuffer       = mb_count;
 
     return ff_dxva2_commit_buffer(avctx, ctx, sc,
-                                  dxva_buftype_SliceControl,
+                                  DECODER_BUFTYPE_SLICE_CONTROL,
                                   ctx_pic->slice,
                                   ctx_pic->slice_count * sizeof(*ctx_pic->slice),
                                   mb_count);

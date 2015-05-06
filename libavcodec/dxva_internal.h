@@ -21,21 +21,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_DXVA_INTERNAL_H
-#define AVCODEC_DXVA_INTERNAL_H
+#ifndef AVCODEC_DXVA2_INTERNAL_H
+#define AVCODEC_DXVA2_INTERNAL_H
 
 #define COBJMACROS
 
 #include "dxva2.h"
 #include <dxva.h>
 
-#define dxva_context                      dxva_context
-#define dxva_surface                      IDirect3DSurface9
-#define dxva_buffer_desc                  DXVA2_DecodeBufferDesc
-#define dxva_buffer_type                  unsigned
-#define dxva_get_buffer(ctx,t,b,s)        IDirectXVideoDecoder_GetBuffer(ctx->decoder, t,b,s)
+#define dxva_surface_t                    IDirect3DSurface9
+#define DECODER_BUFFER_DESC               DXVA2_DecodeBufferDesc
+#define DECODER_BUFFER_TYPE               unsigned
+#define DECODER_GET_BUFFER(ctx,t,b,s)     IDirectXVideoDecoder_GetBuffer(ctx->decoder, t,b,s)
 
-static inline HRESULT dxva_submit_buffer(struct dxva_context *ctx, dxva_buffer_desc *buffer, unsigned buffer_count) {
+static inline HRESULT DECODER_SUBMIT_BUFFER(struct dxva_context *ctx, DECODER_BUFFER_DESC *buffer, unsigned buffer_count) {
     DXVA2_DecodeExecuteParams exec = {
         .pCompressedBuffers = buffer,
         .NumCompBuffers = buffer_count,
@@ -44,17 +43,17 @@ static inline HRESULT dxva_submit_buffer(struct dxva_context *ctx, dxva_buffer_d
     return IDirectXVideoDecoder_Execute(ctx->decoder, &exec);
 }
 
-#define dxva_release_buffer(ctx,t)        IDirectXVideoDecoder_ReleaseBuffer(ctx->decoder, t)
-#define dxva_begin_frame(ctx,s)           IDirectXVideoDecoder_BeginFrame(ctx->decoder, s, NULL)
-#define dxva_end_frame(ctx)               IDirectXVideoDecoder_EndFrame(ctx->decoder, NULL)
+#define DECODER_RELEASE_BUFFER(ctx,t)     IDirectXVideoDecoder_ReleaseBuffer(ctx->decoder, t)
+#define DECODER_BEGIN_FRAME(ctx,s)        IDirectXVideoDecoder_BeginFrame(ctx->decoder, s, NULL)
+#define DECODER_END_FRAME(ctx)            IDirectXVideoDecoder_EndFrame(ctx->decoder, NULL)
 
-#define dxva_buftype_PictureParams        DXVA2_PictureParametersBufferType
-#define dxva_buftype_IQuantizationMatrix  DXVA2_InverseQuantizationMatrixBufferType
-#define dxva_buftype_Bitstream            DXVA2_BitStreamDateBufferType
-#define dxva_buftype_SliceControl         DXVA2_SliceControlBufferType
+#define DECODER_BUFTYPE_PICTURE_PARAMS    DXVA2_PictureParametersBufferType
+#define DECODER_BUFTYPE_QUANT_MATRIX      DXVA2_InverseQuantizationMatrixBufferType
+#define DECODER_BUFTYPE_BITSTREAM         DXVA2_BitStreamDateBufferType
+#define DECODER_BUFTYPE_SLICE_CONTROL     DXVA2_SliceControlBufferType
 
-#define dxva_set_buffer_type(dsc, type)   dsc->CompressedBufferType = type
+#define DECODER_BUFFER_DESC_SET_TYPE(dsc, type)   dsc->CompressedBufferType = type
 
 #include "dxva2_internal.h"
 
-#endif /* AVCODEC_DXVA_INTERNAL_H */
+#endif /* AVCODEC_DXVA2_INTERNAL_H */

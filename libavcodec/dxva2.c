@@ -29,15 +29,15 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 
-dxva_surface *ff_dxva2_get_surface(const AVFrame *frame)
+dxva_surface_t *ff_dxva2_get_surface(const AVFrame *frame)
 {
-    return (dxva_surface*) frame->data[3];
+    return (dxva_surface_t*) frame->data[3];
 }
 
 unsigned ff_dxva2_get_surface_index(const struct dxva_context *ctx,
                                     const AVFrame *frame)
 {
-    dxva_surface *surface = ff_dxva2_get_surface(frame);
+    dxva_surface_t *surface = ff_dxva2_get_surface(frame);
     unsigned i;
 
     for (i = 0; i < ctx->surface_count; i++)
@@ -50,8 +50,8 @@ unsigned ff_dxva2_get_surface_index(const struct dxva_context *ctx,
 
 int ff_dxva2_commit_buffer(AVCodecContext *avctx,
                            struct dxva_context *ctx,
-                           dxva_buffer_desc *dsc,
-                           dxva_buffer_type type, const void *data, unsigned size,
+                           DECODER_BUFFER_DESC *dsc,
+                           DECODER_BUFFER_TYPE type, const void *data, unsigned size,
                            unsigned mb_count)
 {
     void     *dxva_data;
@@ -59,7 +59,7 @@ int ff_dxva2_commit_buffer(AVCodecContext *avctx,
     int      result;
     HRESULT hr;
 
-    hr = dxva_get_buffer(ctx, type, &dxva_data, &dxva_size);
+    hr = DECODER_GET_BUFFER(ctx, type, &dxva_data, &dxva_size);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR, "Failed to get a buffer for %u: 0x%lx\n",
                type, hr);
@@ -69,7 +69,7 @@ int ff_dxva2_commit_buffer(AVCodecContext *avctx,
         memcpy(dxva_data, data, size);
 
         memset(dsc, 0, sizeof(*dsc));
-        dxva_set_buffer_type(dsc, type);
+        DECODER_BUFFER_DESC_SET_TYPE(dsc, type);
         dsc->DataSize             = size;
         dsc->NumMBsInBuffer       = mb_count;
 
@@ -79,7 +79,7 @@ int ff_dxva2_commit_buffer(AVCodecContext *avctx,
         result = -1;
     }
 
-    hr = dxva_release_buffer(ctx, type);
+    hr = DECODER_RELEASE_BUFFER(ctx, type);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR,
                "Failed to release buffer type %u: 0x%lx\n",
@@ -93,17 +93,17 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
                               const void *pp, unsigned pp_size,
                               const void *qm, unsigned qm_size,
                               int (*commit_bs_si)(AVCodecContext *,
-                                                  dxva_buffer_desc *bs,
-                                                  dxva_buffer_desc *slice))
+                                                  DECODER_BUFFER_DESC *bs,
+                                                  DECODER_BUFFER_DESC *slice))
 {
     struct dxva_context *ctx = avctx->hwaccel_context;
     unsigned               buffer_count = 0;
-    dxva_buffer_desc buffer[4];
+    DECODER_BUFFER_DESC buffer[4];
     int result, runs = 0;
     HRESULT hr;
 
     do {
-        hr = dxva_begin_frame(ctx, ff_dxva2_get_surface(frame));
+        hr = DECODER_BEGIN_FRAME(ctx, ff_dxva2_get_surface(frame));
         if (hr == E_PENDING)
             av_usleep(2000);
     } while (hr == E_PENDING && ++runs < 50);
@@ -114,7 +114,7 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
     }
 
     result = ff_dxva2_commit_buffer(avctx, ctx, &buffer[buffer_count],
-                                    dxva_buftype_PictureParams,
+                                    DECODER_BUFTYPE_PICTURE_PARAMS,
                                     pp, pp_size, 0);
     if (result) {
         av_log(avctx, AV_LOG_ERROR,
@@ -125,7 +125,7 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
 
     if (qm_size > 0) {
         result = ff_dxva2_commit_buffer(avctx, ctx, &buffer[buffer_count],
-                                        dxva_buftype_IQuantizationMatrix,
+                                        DECODER_BUFTYPE_QUANT_MATRIX,
                                         qm, qm_size, 0);
         if (result) {
             av_log(avctx, AV_LOG_ERROR,
@@ -149,14 +149,14 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
 
     assert(buffer_count == 1 + (qm_size > 0) + 2);
 
-    hr = dxva_submit_buffer(ctx, buffer, buffer_count);
+    hr = DECODER_SUBMIT_BUFFER(ctx, buffer, buffer_count);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR, "Failed to execute: 0x%lx\n", hr);
         result = -1;
     }
 
 end:
-    hr = dxva_end_frame(ctx);
+    hr = DECODER_END_FRAME(ctx);
     if (FAILED(hr)) {
         av_log(avctx, AV_LOG_ERROR, "Failed to end frame: 0x%lx\n", hr);
         result = -1;

@@ -175,8 +175,8 @@ static void fill_slice(AVCodecContext *avctx, DXVA_SliceInfo *slice,
 }
 
 static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
-                                             dxva_buffer_desc *bs,
-                                             dxva_buffer_desc *sc)
+                                             DECODER_BUFFER_DESC *bs,
+                                             DECODER_BUFFER_DESC *sc)
 {
     const VC1Context *v = avctx->priv_data;
     struct dxva_context *ctx = avctx->hwaccel_context;
@@ -196,8 +196,9 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     unsigned dxva_size;
     int result;
 
-    if (FAILED(dxva_get_buffer(ctx, dxva_buftype_Bitstream,
-                               &dxva_data_ptr, &dxva_size)))
+    if (FAILED(DECODER_GET_BUFFER(ctx,
+	                              DECODER_BUFTYPE_BITSTREAM,
+                                  &dxva_data_ptr, &dxva_size)))
         return -1;
 
     dxva_data = dxva_data_ptr;
@@ -214,19 +215,19 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
             memset(dxva_data + start_code_size + slice_size, 0, padding);
         slice->dwSliceBitsInBuffer = 8 * data_size;
     }
-    if (FAILED(dxva_release_buffer(ctx, dxva_buftype_Bitstream)))
+    if (FAILED(DECODER_RELEASE_BUFFER(ctx, DECODER_BUFTYPE_BITSTREAM)))
         return -1;
     if (result)
         return result;
 
     memset(bs, 0, sizeof(*bs));
-    dxva_set_buffer_type(bs, dxva_buftype_Bitstream);
+    DECODER_BUFFER_DESC_SET_TYPE(bs, DECODER_BUFTYPE_BITSTREAM);
     bs->DataSize             = data_size;
     bs->NumMBsInBuffer       = s->mb_width * s->mb_height;
     assert((bs->DataSize & 127) == 0);
 
     return ff_dxva2_commit_buffer(avctx, ctx, sc,
-                                  dxva_buftype_SliceControl,
+                                  DECODER_BUFTYPE_SLICE_CONTROL,
                                   slice, sizeof(*slice), bs->NumMBsInBuffer);
 }
 

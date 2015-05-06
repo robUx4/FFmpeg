@@ -20,22 +20,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_DXVA2_INTERNAL_H
-#define AVCODEC_DXVA2_INTERNAL_H
+#ifndef AVCODEC_DXVA_INTERNAL_H
+#define AVCODEC_DXVA_INTERNAL_H
 
 #include "config.h"
 
 #include "avcodec.h"
 #include "mpegvideo.h"
 
-dxva_surface *ff_dxva2_get_surface(const AVFrame *frame);
+dxva_surface_t *ff_dxva2_get_surface(const AVFrame *frame);
 
 unsigned ff_dxva2_get_surface_index(const struct dxva_context *,
                                     const AVFrame *frame);
 
 int ff_dxva2_commit_buffer(AVCodecContext *, struct dxva_context *,
-                           dxva_buffer_desc *,
-                           dxva_buffer_type type, const void *data, unsigned size,
+                           DECODER_BUFFER_DESC *,
+                           DECODER_BUFFER_TYPE type, const void *data, unsigned size,
                            unsigned mb_count);
 
 
@@ -43,7 +43,7 @@ int ff_dxva2_common_end_frame(AVCodecContext *, AVFrame *,
                               const void *pp, unsigned pp_size,
                               const void *qm, unsigned qm_size,
                               int (*commit_bs_si)(AVCodecContext *,
-                                                  dxva_buffer_desc *bs,
-                                                  dxva_buffer_desc *slice));
+                                                  DECODER_BUFFER_DESC *bs,
+                                                  DECODER_BUFFER_DESC *slice));
 
-#endif /* AVCODEC_DXVA2_INTERNAL_H */
+#endif /* AVCODEC_DXVA_INTERNAL_H */

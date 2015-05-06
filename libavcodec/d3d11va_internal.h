@@ -30,21 +30,21 @@
 #include <dxva.h>
 
 #define dxva_context                      d3d11va_context
-#define dxva_surface                      ID3D11VideoDecoderOutputView
-#define dxva_buffer_desc                  D3D11_VIDEO_DECODER_BUFFER_DESC
-#define dxva_buffer_type                  D3D11_VIDEO_DECODER_BUFFER_TYPE
-#define dxva_get_buffer(ctx,t,b,s)        ID3D11VideoContext_GetDecoderBuffer(ctx->video_context, ctx->decoder, t,s,b)
-#define dxva_submit_buffer(ctx,b,c)       ID3D11VideoContext_SubmitDecoderBuffers(ctx->video_context, ctx->decoder, c,b)
-#define dxva_release_buffer(ctx,t)        ID3D11VideoContext_ReleaseDecoderBuffer(ctx->video_context, ctx->decoder, t)
-#define dxva_begin_frame(ctx,s)           ID3D11VideoContext_DecoderBeginFrame(ctx->video_context, ctx->decoder, s, 0, NULL)
-#define dxva_end_frame(ctx)               ID3D11VideoContext_DecoderEndFrame(ctx->video_context, ctx->decoder)
+#define dxva_surface_t                    ID3D11VideoDecoderOutputView
+#define DECODER_BUFFER_DESC               D3D11_VIDEO_DECODER_BUFFER_DESC
+#define DECODER_BUFFER_TYPE               D3D11_VIDEO_DECODER_BUFFER_TYPE
+#define DECODER_GET_BUFFER(ctx,t,b,s)     ID3D11VideoContext_GetDecoderBuffer(ctx->video_context, ctx->decoder, t,s,b)
+#define DECODER_SUBMIT_BUFFER(ctx,b,c)    ID3D11VideoContext_SubmitDecoderBuffers(ctx->video_context, ctx->decoder, c,b)
+#define DECODER_RELEASE_BUFFER(ctx,t)     ID3D11VideoContext_ReleaseDecoderBuffer(ctx->video_context, ctx->decoder, t)
+#define DECODER_BEGIN_FRAME(ctx,s)        ID3D11VideoContext_DecoderBeginFrame(ctx->video_context, ctx->decoder, s, 0, NULL)
+#define DECODER_END_FRAME(ctx)            ID3D11VideoContext_DecoderEndFrame(ctx->video_context, ctx->decoder)
 
-#define dxva_buftype_PictureParams        D3D11_VIDEO_DECODER_BUFFER_PICTURE_PARAMETERS
-#define dxva_buftype_IQuantizationMatrix  D3D11_VIDEO_DECODER_BUFFER_INVERSE_QUANTIZATION_MATRIX
-#define dxva_buftype_Bitstream            D3D11_VIDEO_DECODER_BUFFER_BITSTREAM
-#define dxva_buftype_SliceControl         D3D11_VIDEO_DECODER_BUFFER_SLICE_CONTROL
+#define DECODER_BUFTYPE_PICTURE_PARAMS    D3D11_VIDEO_DECODER_BUFFER_PICTURE_PARAMETERS
+#define DECODER_BUFTYPE_QUANT_MATRIX      D3D11_VIDEO_DECODER_BUFFER_INVERSE_QUANTIZATION_MATRIX
+#define DECODER_BUFTYPE_BITSTREAM         D3D11_VIDEO_DECODER_BUFFER_BITSTREAM
+#define DECODER_BUFTYPE_SLICE_CONTROL     D3D11_VIDEO_DECODER_BUFFER_SLICE_CONTROL
 
-#define dxva_set_buffer_type(dsc, type)   dsc->BufferType = type
+#define DECODER_BUFFER_DESC_SET_TYPE(dsc, type)   dsc->BufferType = type
 
 #define ff_dxva2_get_surface(f)                        ff_d3d11va_get_surface(f)
 #define ff_dxva2_get_surface_index(c, f)               ff_d3d11va_get_surface_index(c, f)
