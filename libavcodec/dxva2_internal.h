@@ -21,39 +21,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_DXVA2_INTERNAL_H
-#define AVCODEC_DXVA2_INTERNAL_H
+#ifndef AVCODEC_DXVA_INTERNAL_H
+#define AVCODEC_DXVA_INTERNAL_H
 
 #define COBJMACROS
 
+#include "config.h"
+
 #include "dxva2.h"
+#include "d3d11va.h"
+#if HAVE_DXVA_H
 #include <dxva.h>
+#endif
 
-#define dxva_surface_t                    IDirect3DSurface9
-#define DECODER_BUFFER_DESC               DXVA2_DecodeBufferDesc
-#define DECODER_BUFFER_TYPE               unsigned
-#define DECODER_GET_BUFFER(ctx,t,b,s)     IDirectXVideoDecoder_GetBuffer(ctx->decoder, t,b,s)
+#include "avcodec.h"
+#include "mpegvideo.h"
 
-static inline HRESULT DECODER_SUBMIT_BUFFER(struct dxva_context *ctx, DECODER_BUFFER_DESC *buffer, unsigned buffer_count) {
-    DXVA2_DecodeExecuteParams exec = {
-        .pCompressedBuffers = buffer,
-        .NumCompBuffers = buffer_count,
-        .pExtensionData = NULL,
-    };
-    return IDirectXVideoDecoder_Execute(ctx->decoder, &exec);
-}
+typedef void DECODER_BUFFER_DESC;
 
-#define DECODER_RELEASE_BUFFER(ctx,t)     IDirectXVideoDecoder_ReleaseBuffer(ctx->decoder, t)
-#define DECODER_BEGIN_FRAME(ctx,s)        IDirectXVideoDecoder_BeginFrame(ctx->decoder, s, NULL)
-#define DECODER_END_FRAME(ctx)            IDirectXVideoDecoder_EndFrame(ctx->decoder, NULL)
+#define D3D11VA_CONTEXT(ctx) ((struct av_d3d11va_context *) ctx)
+#define DXVA2_CONTEXT(ctx)   ((struct dxva_context *) ctx)
 
-#define DECODER_BUFTYPE_PICTURE_PARAMS    DXVA2_PictureParametersBufferType
-#define DECODER_BUFTYPE_QUANT_MATRIX      DXVA2_InverseQuantizationMatrixBufferType
-#define DECODER_BUFTYPE_BITSTREAM         DXVA2_BitStreamDateBufferType
-#define DECODER_BUFTYPE_SLICE_CONTROL     DXVA2_SliceControlBufferType
+void *ff_dxva2_get_surface(const AVFrame *frame);
 
-#define DECODER_BUFFER_DESC_SET_TYPE(dsc, type)   dsc->CompressedBufferType = type
+unsigned ff_dxva2_get_surface_index(const AVCodecContext *avctx,
+                                    const struct dxva_context *,
+                                    const AVFrame *frame);
 
-#include "dxva_internal_template.h"
+int ff_dxva2_commit_buffer(AVCodecContext *, struct dxva_context *,
+                           DECODER_BUFFER_DESC *,
+                           unsigned type, const void *data, unsigned size,
+                           unsigned mb_count);
 
-#endif /* AVCODEC_DXVA2_INTERNAL_H */
+
+int ff_dxva2_common_end_frame(AVCodecContext *, AVFrame *,
+                              const void *pp, unsigned pp_size,
+                              const void *qm, unsigned qm_size,
+                              int (*commit_bs_si)(AVCodecContext *,
+                                                  DECODER_BUFFER_DESC *bs,
+                                                  DECODER_BUFFER_DESC *slice));
+
+#endif /* AVCODEC_DXVA_INTERNAL_H */
