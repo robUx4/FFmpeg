@@ -39,16 +39,31 @@
 
 typedef void DECODER_BUFFER_DESC;
 
-#define D3D11VA_CONTEXT(ctx) ((struct av_d3d11va_context *) ctx)
-#define DXVA2_CONTEXT(ctx)   ((struct dxva_context *) ctx)
+typedef union {
+    struct av_d3d11va_context  d3d11va;
+    struct dxva_context        dxva2;
+} av_dxva_context_t;
+
+#define D3D11VA_CONTEXT(ctx) (&ctx->d3d11va)
+#define DXVA2_CONTEXT(ctx)   (&ctx->dxva2)
+
+#define DXVA_CONTEXT_WORKAROUND(avctx, ctx)     (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.workaround : ctx->dxva2.workaround)
+#define DXVA_CONTEXT_COUNT(avctx, ctx)          (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.surface_count : ctx->dxva2.surface_count)
+#define DXVA_CONTEXT_SURFACE(avctx, ctx, i)     (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.surface[i] : ctx->dxva2.surface[i])
+#define DXVA_CONTEXT_DECODER(avctx, ctx)        (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.decoder : ctx->dxva2.decoder)
+#define DXVA_CONTEXT_REPORT_ID(avctx, ctx)      (*(avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? &ctx->d3d11va.report_id : &ctx->dxva2.report_id))
+#define DXVA_CONTEXT_CFG(avctx, ctx)            (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.cfg : ctx->dxva2.cfg)
+#define DXVA_CONTEXT_CFG_BITSTREAM(avctx, ctx)  (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.cfg->ConfigBitstreamRaw : ctx->dxva2.cfg->ConfigBitstreamRaw)
+#define DXVA_CONTEXT_CFG_INTRARESID(avctx, ctx) (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.cfg->ConfigIntraResidUnsigned : ctx->dxva2.cfg->ConfigIntraResidUnsigned)
+#define DXVA_CONTEXT_CFG_RESIDACCEL(avctx, ctx) (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD ? ctx->d3d11va.cfg->ConfigResidDiffAccelerator : ctx->dxva2.cfg->ConfigResidDiffAccelerator)
 
 void *ff_dxva2_get_surface(const AVFrame *frame);
 
 unsigned ff_dxva2_get_surface_index(const AVCodecContext *avctx,
-                                    const struct dxva_context *,
+                                    const av_dxva_context_t *,
                                     const AVFrame *frame);
 
-int ff_dxva2_commit_buffer(AVCodecContext *, struct dxva_context *,
+int ff_dxva2_commit_buffer(AVCodecContext *, av_dxva_context_t *,
                            DECODER_BUFFER_DESC *,
                            unsigned type, const void *data, unsigned size,
                            unsigned mb_count);

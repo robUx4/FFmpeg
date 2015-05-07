@@ -36,7 +36,7 @@ struct dxva2_picture_context {
 };
 
 static void fill_picture_parameters(AVCodecContext *avctx,
-                                    struct dxva_context *ctx,
+                                    av_dxva_context_t *ctx,
                                     const struct MpegEncContext *s,
                                     DXVA_PictureParameters *pp)
 {
@@ -102,7 +102,7 @@ static void fill_picture_parameters(AVCodecContext *avctx,
 }
 
 static void fill_quantization_matrices(AVCodecContext *avctx,
-                                       struct dxva_context *ctx,
+                                       av_dxva_context_t *ctx,
                                        const struct MpegEncContext *s,
                                        DXVA_QmatrixData *qm)
 {
@@ -150,7 +150,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
                                              DECODER_BUFFER_DESC *sc)
 {
     const struct MpegEncContext *s = avctx->priv_data;
-    struct dxva_context *ctx = avctx->hwaccel_context;
+    av_dxva_context_t *ctx = avctx->hwaccel_context;
     struct dxva2_picture_context *ctx_pic =
         s->current_picture_ptr->hwaccel_picture_private;
     const int is_field = s->picture_structure != PICT_FRAME;
@@ -161,6 +161,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
     unsigned i;
     unsigned type;
 
+#if CONFIG_D3D11VA
     if (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD) {
         type = D3D11_VIDEO_DECODER_BUFFER_BITSTREAM;
         if (FAILED(ID3D11VideoContext_GetDecoderBuffer(D3D11VA_CONTEXT(ctx)->video_context,
@@ -169,6 +170,8 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
                                                        &dxva_size, &dxva_data_ptr)))
             return -1;
     }
+#endif
+#if CONFIG_DXVA2
     if (avctx->pix_fmt == AV_PIX_FMT_DXVA2_VLD) {
         type = DXVA2_BitStreamDateBufferType;
         if (FAILED(IDirectXVideoDecoder_GetBuffer(DXVA2_CONTEXT(ctx)->decoder,
@@ -176,6 +179,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
                                                   &dxva_data_ptr, &dxva_size)))
             return -1;
     }
+#endif
 
     dxva_data = dxva_data_ptr;
     current = dxva_data;
@@ -201,17 +205,22 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
         memcpy(current, &ctx_pic->bitstream[position], size);
         current += size;
     }
+#if CONFIG_D3D11VA
     if (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD) {
         if (FAILED(ID3D11VideoContext_ReleaseDecoderBuffer(D3D11VA_CONTEXT(ctx)->video_context, D3D11VA_CONTEXT(ctx)->decoder, type)))
             return -1;
     }
+#endif
+#if CONFIG_DXVA2
     if (avctx->pix_fmt == AV_PIX_FMT_DXVA2_VLD) {
         if (FAILED(IDirectXVideoDecoder_ReleaseBuffer(DXVA2_CONTEXT(ctx)->decoder, type)))
             return -1;
     }
+#endif
     if (i < ctx_pic->slice_count)
         return -1;
 
+#if CONFIG_D3D11VA
     if (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD) {
         D3D11_VIDEO_DECODER_BUFFER_DESC *dsc11 = bs;
         memset(dsc11, 0, sizeof(*dsc11));
@@ -221,6 +230,8 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
 
         type = D3D11_VIDEO_DECODER_BUFFER_SLICE_CONTROL;
     }
+#endif
+#if CONFIG_DXVA2
     if (avctx->pix_fmt == AV_PIX_FMT_DXVA2_VLD) {
         DXVA2_DecodeBufferDesc *dsc2 = bs;
         memset(dsc2, 0, sizeof(*dsc2));
@@ -230,6 +241,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
 
         type = DXVA2_SliceControlBufferType;
     }
+#endif
 
     return ff_dxva2_commit_buffer(avctx, ctx, sc,
                                   type,
@@ -243,11 +255,11 @@ static int dxva2_mpeg2_start_frame(AVCodecContext *avctx,
                                    av_unused uint32_t size)
 {
     const struct MpegEncContext *s = avctx->priv_data;
-    struct dxva_context *ctx = avctx->hwaccel_context;
+    av_dxva_context_t *ctx = avctx->hwaccel_context;
     struct dxva2_picture_context *ctx_pic =
         s->current_picture_ptr->hwaccel_picture_private;
 
-    if (!ctx->decoder || !ctx->cfg || ctx->surface_count <= 0)
+    if (DXVA_CONTEXT_DECODER(avctx, ctx)==NULL || DXVA_CONTEXT_CFG(avctx, ctx)==NULL || DXVA_CONTEXT_COUNT(avctx, ctx) <= 0)
         return -1;
     assert(ctx_pic);
 
@@ -301,6 +313,7 @@ static int dxva2_mpeg2_end_frame(AVCodecContext *avctx)
     return ret;
 }
 
+#if CONFIG_DXVA2
 AVHWAccel ff_mpeg2_dxva2_hwaccel = {
     .name           = "mpeg2_dxva2",
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -311,7 +324,9 @@ AVHWAccel ff_mpeg2_dxva2_hwaccel = {
     .end_frame      = dxva2_mpeg2_end_frame,
     .frame_priv_data_size = sizeof(struct dxva2_picture_context),
 };
+#endif
 
+#if CONFIG_D3D11VA
 AVHWAccel ff_mpeg2_d3d11va_hwaccel = {
     .name           = "mpeg2_d3d11va",
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -322,3 +337,4 @@ AVHWAccel ff_mpeg2_d3d11va_hwaccel = {
     .end_frame      = dxva2_mpeg2_end_frame,
     .frame_priv_data_size = sizeof(struct dxva2_picture_context),
 };
+#endif
