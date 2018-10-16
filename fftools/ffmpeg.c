@@ -4738,6 +4738,7 @@ static int transcode(void)
         if (ost->encoding_needed) {
             av_freep(&ost->enc_ctx->stats_in);
         }
+        av_frame_unref(ost->last_frame);
         total_packets_written += ost->packets_written;
     }
 
