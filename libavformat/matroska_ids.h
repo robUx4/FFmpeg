@@ -49,7 +49,7 @@
 #define MATROSKA_ID_TITLE      0x7BA9
 #define MATROSKA_ID_TIMECODESCALE 0x2AD7B1
 
-/* ID in the tracks master */
+/* IDs in the tracks master */
 #define MATROSKA_ID_TRACKENTRY 0xAE
 
 /* IDs in the trackentry master */
@@ -79,6 +79,8 @@
 #define MATROSKA_ID_CODECDOWNLOADURL 0x26B240
 #define MATROSKA_ID_CODECINFOURL 0x3B4040
 #define MATROSKA_ID_TRACKAUDIO     0xE1
+
+/* IDs in the contentencodings master */
 #define MATROSKA_ID_TRACKCONTENTENCODING 0x6240
 
 /* IDs in the content encoding master */
@@ -87,9 +89,12 @@
 #define MATROSKA_ID_ENCODINGTYPE 0x5033
 #define MATROSKA_ID_ENCODINGCOMPRESSION 0x5034
 #define MATROSKA_ID_ENCODINGENCRYPTION 0x5035
+
+/* IDs in the contentcompression master */
 #define MATROSKA_ID_ENCODINGCOMPALGO 0x4254
 #define MATROSKA_ID_ENCODINGCOMPSETTINGS 0x4255
 
+/* IDs in the contentencryption master */
 #define MATROSKA_ID_ENCODINGENCALGO 0x47E1
 #define MATROSKA_ID_ENCODINGENCKEYID 0x47E2
 #define MATROSKA_ID_ENCODINGSIGNATURE 0x47E3
@@ -98,8 +103,13 @@
 #define MATROSKA_ID_ENCODINGSIGHASHALGO 0x47E6
 #define MATROSKA_ID_ENCODINGENCAESSETTINGS 0x47E7
 
+/* IDs in the trackoperation master */
 #define MATROSKA_ID_TRACKCOMBINEPLANES 0xE3
+
+/* IDs in the trackcombineplanes master */
 #define MATROSKA_ID_TRACKPLANE         0xE4
+
+/* IDs in the trackplane master */
 #define MATROSKA_ID_TRACKPLANEUID      0xE5
 #define MATROSKA_ID_TRACKPLANETYPE     0xE6
 
@@ -123,6 +133,7 @@
 #define MATROSKA_ID_VIDEOFRAMERATE 0x2383E3
 #define MATROSKA_ID_VIDEOCOLORSPACE 0x2EB524
 
+/* IDs in the colour master */
 #define MATROSKA_ID_VIDEOCOLORMATRIXCOEFF 0x55B1
 #define MATROSKA_ID_VIDEOCOLORBITSPERCHANNEL 0x55B2
 #define MATROSKA_ID_VIDEOCOLORCHROMASUBHORZ 0x55B3
@@ -133,12 +144,12 @@
 #define MATROSKA_ID_VIDEOCOLORCHROMASITINGVERT 0x55B8
 #define MATROSKA_ID_VIDEOCOLORRANGE 0x55B9
 #define MATROSKA_ID_VIDEOCOLORTRANSFERCHARACTERISTICS 0x55BA
-
 #define MATROSKA_ID_VIDEOCOLORPRIMARIES 0x55BB
 #define MATROSKA_ID_VIDEOCOLORMAXCLL 0x55BC
 #define MATROSKA_ID_VIDEOCOLORMAXFALL 0x55BD
-
 #define MATROSKA_ID_VIDEOCOLORMASTERINGMETA 0x55D0
+
+/* IDs in the masteringmetadata master */
 #define MATROSKA_ID_VIDEOCOLOR_RX 0x55D1
 #define MATROSKA_ID_VIDEOCOLOR_RY 0x55D2
 #define MATROSKA_ID_VIDEOCOLOR_GX 0x55D3
@@ -150,6 +161,7 @@
 #define MATROSKA_ID_VIDEOCOLOR_LUMINANCEMAX 0x55D9
 #define MATROSKA_ID_VIDEOCOLOR_LUMINANCEMIN 0x55DA
 
+/* IDs in the projection master */
 #define MATROSKA_ID_VIDEOPROJECTIONTYPE 0x7671
 #define MATROSKA_ID_VIDEOPROJECTIONPRIVATE 0x7672
 #define MATROSKA_ID_VIDEOPROJECTIONPOSEYAW 0x7673
@@ -162,14 +174,14 @@
 #define MATROSKA_ID_AUDIOBITDEPTH 0x6264
 #define MATROSKA_ID_AUDIOOUTSAMPLINGFREQ 0x78B5
 
-/* ID in the cues master */
+/* IDs in the cues master */
 #define MATROSKA_ID_POINTENTRY 0xBB
 
 /* IDs in the pointentry master */
 #define MATROSKA_ID_CUETIME    0xB3
 #define MATROSKA_ID_CUETRACKPOSITION 0xB7
 
-/* IDs in the cuetrackposition master */
+/* IDs in the cuetrackpositions master */
 #define MATROSKA_ID_CUEDURATION 0xB2
 #define MATROSKA_ID_CUERELATIVEPOSITION 0xF0
 #define MATROSKA_ID_CUECLUSTERPOSITION 0xF1
@@ -178,13 +190,19 @@
 
 /* IDs in the tags master */
 #define MATROSKA_ID_TAG                 0x7373
+
+/* IDs in the tag master */
 #define MATROSKA_ID_TAGTARGETS          0x63C0
 #define MATROSKA_ID_SIMPLETAG           0x67C8
+
+/* IDs in the simpletag master */
 #define MATROSKA_ID_TAGLANG             0x447A
 #define MATROSKA_ID_TAGDEFAULT          0x4484
 #define MATROSKA_ID_TAGDEFAULT_BUG      0x44B4
 #define MATROSKA_ID_TAGSTRING           0x4487
 #define MATROSKA_ID_TAGNAME             0x45A3
+
+/* IDs in the targets master */
 #define MATROSKA_ID_TAGTARGETS_CHAPTERUID 0x63C4
 #define MATROSKA_ID_TAGTARGETS_TRACKUID   0x63C5
 #define MATROSKA_ID_TAGTARGETS_ATTACHUID  0x63C6
@@ -193,6 +211,8 @@
 
 /* IDs in the attachments master */
 #define MATROSKA_ID_ATTACHEDFILE        0x61A7
+
+/* IDs in the attachedfile master */
 #define MATROSKA_ID_FILEDATA            0x465C
 #define MATROSKA_ID_FILEMIMETYPE        0x4660
 #define MATROSKA_ID_FILENAME            0x466E
@@ -214,10 +234,14 @@
 #define MATROSKA_ID_BLOCKADDITIONS 0x75A1
 #define MATROSKA_ID_DISCARDPADDING 0x75A2
 
+/* IDs in the blockadditions master */
 #define MATROSKA_ID_BLOCKMORE 0xA6
+
+/* IDs in the blockmore master */
 #define MATROSKA_ID_BLOCKADDITIONAL 0xA5
 #define MATROSKA_ID_BLOCKADDID 0xEE
 
+/* IDs in the referenceframe master */
 /* IDs in the seekhead master */
 #define MATROSKA_ID_SEEKENTRY  0x4DBB
 
@@ -227,11 +251,15 @@
 
 /* IDs in the chapters master */
 #define MATROSKA_ID_EDITIONENTRY        0x45B9
+
+/* IDs in the editionentry master */
 #define MATROSKA_ID_CHAPTERATOM         0xB6
 #define MATROSKA_ID_EDITIONUID          0x45BC
 #define MATROSKA_ID_EDITIONFLAGHIDDEN   0x45BD
 #define MATROSKA_ID_EDITIONFLAGDEFAULT  0x45DB
 #define MATROSKA_ID_EDITIONFLAGORDERED  0x45DD
+
+/* IDs in the chapteratom master */
 #define MATROSKA_ID_CHAPTERDISPLAY      0x80
 #define MATROSKA_ID_CHAPTERTIMESTART    0x91
 #define MATROSKA_ID_CHAPTERTIMEEND      0x92
@@ -239,6 +267,8 @@
 #define MATROSKA_ID_CHAPTERFLAGENABLED  0x4598
 #define MATROSKA_ID_CHAPTERPHYSEQUIV    0x63C3
 #define MATROSKA_ID_CHAPTERUID          0x73C4
+
+/* IDs in the chapterdisplay master */
 #define MATROSKA_ID_CHAPSTRING          0x85
 #define MATROSKA_ID_CHAPLANG            0x437C
 #define MATROSKA_ID_CHAPCOUNTRY         0x437E
