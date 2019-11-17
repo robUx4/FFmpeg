@@ -287,7 +287,7 @@ OBJS-$(CONFIG_LVF_DEMUXER)               += lvfdec.o
 OBJS-$(CONFIG_LXF_DEMUXER)               += lxfdec.o
 OBJS-$(CONFIG_M4V_DEMUXER)               += m4vdec.o rawdec.o
 OBJS-$(CONFIG_M4V_MUXER)                 += rawenc.o
-OBJS-$(CONFIG_MATROSKA_DEMUXER)          += matroskadec.o matroska.o  \
+OBJS-$(CONFIG_MATROSKA_DEMUXER)          += matroskadec.o matroska.o matroskasem.o \
                                             rmsipr.o flac_picture.o \
                                             oggparsevorbis.o vorbiscomment.o \
                                             flac_picture.o replaygain.o
