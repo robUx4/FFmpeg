@@ -415,6 +415,9 @@
         <xsl:when test="contains($label,' /')">
             <xsl:call-template name="outputEnumLabel"><xsl:with-param name="align" select="$align"/><xsl:with-param name="label" select="substring-before($label, ' /')"/></xsl:call-template>
         </xsl:when>
+        <xsl:when test="contains($label,'/')">
+            <xsl:call-template name="outputEnumLabel"><xsl:with-param name="align" select="$align"/><xsl:with-param name="label" select="substring-before($label, '/')"/></xsl:call-template>
+        </xsl:when>
         <xsl:when test="contains($label,'__')">
             <xsl:call-template name="outputEnumLabel"><xsl:with-param name="align" select="$align"/><xsl:with-param name="label" select="concat(substring-before($label, '__'), substring-after($label, '__'))"/></xsl:call-template>
         </xsl:when>
