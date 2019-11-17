@@ -70,11 +70,6 @@
         <xsl:call-template name="parsePath">
             <xsl:with-param name="node" select="."/>
         </xsl:call-template>
-
-        <xsl:variable name="plainPath">
-            <xsl:value-of select="translate(translate(@path, '))', ''), '(1*(', '')" />
-        </xsl:variable>
-        <xsl:variable name="myPath" select="@path"/>
     </xsl:template>
 
     <xsl:template name="parsePath">
