@@ -246,8 +246,63 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='Projection'"><xsl:text>projection</xsl:text></xsl:when>
                         <xsl:when test="@name='FrameRate'"><xsl:text>frame_rate</xsl:text></xsl:when>
                         <xsl:when test="@name='ColourSpace'"><xsl:text>color_space</xsl:text></xsl:when>
+                        <xsl:when test="@name='MatrixCoefficients'"><xsl:text>matrix_coefficients</xsl:text></xsl:when>
+                        <xsl:when test="@name='BitsPerChannel'"><xsl:text>bits_per_channel</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChromaSubsamplingHorz'"><xsl:text>chroma_sub_horz</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChromaSubsamplingVert'"><xsl:text>chroma_sub_vert</xsl:text></xsl:when>
+                        <xsl:when test="@name='CbSubsamplingHorz'"><xsl:text>cb_sub_horz</xsl:text></xsl:when>
+                        <xsl:when test="@name='CbSubsamplingVert'"><xsl:text>cb_sub_vert</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChromaSitingHorz'"><xsl:text>chroma_siting_horz</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChromaSitingVert'"><xsl:text>chroma_siting_vert</xsl:text></xsl:when>
+                        <xsl:when test="@name='Range'"><xsl:text>range</xsl:text></xsl:when>
+                        <xsl:when test="@name='TransferCharacteristics'"><xsl:text>transfer_characteristics</xsl:text></xsl:when>
+                        <xsl:when test="@name='Primaries'"><xsl:text>primaries</xsl:text></xsl:when>
+                        <xsl:when test="@name='MaxCLL'"><xsl:text>max_cll</xsl:text></xsl:when>
+                        <xsl:when test="@name='MaxFALL'"><xsl:text>max_fall</xsl:text></xsl:when>
+                        <xsl:when test="@name='MasteringMetadata'"><xsl:text>mastering_meta</xsl:text></xsl:when>
+                        <xsl:when test="@name='PrimaryRChromaticityX'"><xsl:text>r_x</xsl:text></xsl:when>
+                        <xsl:when test="@name='PrimaryRChromaticityY'"><xsl:text>r_y</xsl:text></xsl:when>
+                        <xsl:when test="@name='PrimaryGChromaticityX'"><xsl:text>g_x</xsl:text></xsl:when>
+                        <xsl:when test="@name='PrimaryGChromaticityY'"><xsl:text>g_y</xsl:text></xsl:when>
+                        <xsl:when test="@name='PrimaryBChromaticityX'"><xsl:text>b_x</xsl:text></xsl:when>
+                        <xsl:when test="@name='PrimaryBChromaticityY'"><xsl:text>b_y</xsl:text></xsl:when>
+                        <xsl:when test="@name='WhitePointChromaticityX'"><xsl:text>white_x</xsl:text></xsl:when>
+                        <xsl:when test="@name='WhitePointChromaticityY'"><xsl:text>white_y</xsl:text></xsl:when>
+                        <xsl:when test="@name='LuminanceMax'"><xsl:text>max_luminance</xsl:text></xsl:when>
+                        <xsl:when test="@name='LuminanceMin'"><xsl:text>min_luminance</xsl:text></xsl:when>
+                        <xsl:when test="@name='ProjectionType'"><xsl:text>type</xsl:text></xsl:when>
+                        <xsl:when test="@name='ProjectionPrivate'"><xsl:text>private</xsl:text></xsl:when>
+                        <xsl:when test="@name='ProjectionPoseYaw'"><xsl:text>yaw</xsl:text></xsl:when>
+                        <xsl:when test="@name='ProjectionPosePitch'"><xsl:text>pitch</xsl:text></xsl:when>
+                        <xsl:when test="@name='ProjectionPoseRoll'"><xsl:text>roll</xsl:text></xsl:when>
+                        <xsl:when test="@name='Channels'"><xsl:text>channels</xsl:text></xsl:when>
+                        <xsl:when test="@name='SamplingFrequency'"><xsl:text>samplerate</xsl:text></xsl:when>
+                        <xsl:when test="@name='OutputSamplingFrequency'"><xsl:text>out_samplerate</xsl:text></xsl:when>
+                        <xsl:when test="@name='BitDepth'"><xsl:text>bitdepth</xsl:text></xsl:when>
+                        <xsl:when test="@name='CuePoint'"><xsl:text>index</xsl:text></xsl:when>
+                        <xsl:when test="@name='CueTime'"><xsl:text>time</xsl:text></xsl:when>
+                        <xsl:when test="@name='CueTrackPositions'"><xsl:text>pos</xsl:text></xsl:when>
+                        <xsl:when test="@name='CueTime'"><xsl:text>time</xsl:text></xsl:when>
+                        <xsl:when test="@name='CueClusterPosition'"><xsl:text>pos</xsl:text></xsl:when>
+                        <xsl:when test="@name='CueTrack'"><xsl:text>track</xsl:text></xsl:when>
+                        <xsl:when test="@name='Tags'"><xsl:text>tags</xsl:text></xsl:when>
+                        <xsl:when test="@name='Targets'"><xsl:text>target</xsl:text></xsl:when>
+                        <xsl:when test="@name='SimpleTag'"><xsl:text>tag</xsl:text></xsl:when>
+                        <xsl:when test="@name='AttachedFile'"><xsl:text>attachments</xsl:text></xsl:when>
+                        <xsl:when test="@name='FileData'"><xsl:text>bin</xsl:text></xsl:when>
+                        <xsl:when test="@name='FileMimeType'"><xsl:text>mime</xsl:text></xsl:when>
+                        <xsl:when test="@name='FileName'"><xsl:text>filename</xsl:text></xsl:when>
+                        <xsl:when test="@name='FileUID'"><xsl:text>uid</xsl:text></xsl:when>
+                        <xsl:when test="@name='SimpleBlock'"><xsl:text>bin</xsl:text></xsl:when>
+                        <xsl:when test="@name='Timestamp'"><xsl:text>timecode</xsl:text></xsl:when>
+                        <xsl:when test="@name='BlockDuration'"><xsl:text>duration</xsl:text></xsl:when>
+                        <xsl:when test="@name='Block'"><xsl:text>bin</xsl:text></xsl:when>
+                        <xsl:when test="@name='ReferenceBlock'"><xsl:text>reference</xsl:text></xsl:when>
+                        <xsl:when test="@name='DiscardPadding'"><xsl:text>discard_padding</xsl:text></xsl:when>
+                        
                     </xsl:choose>
                 </xsl:variable>
+
                 <!-- Structure name for master elements stored in an EbmlList -->
                 <xsl:variable name="lavfListElementSize">
                     <xsl:call-template name="ebmlListStructure">
@@ -266,9 +321,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='DisplayWidth'"><xsl:text>-1</xsl:text></xsl:when>
                         <xsl:when test="@name='DisplayHeight'"><xsl:text>-1</xsl:text></xsl:when>
                         <xsl:when test="@name='DisplayUnit'"><xsl:text>MATROSKA_VIDEO_DISPLAYUNIT_PIXELS</xsl:text></xsl:when>
-                        <xsl:when test="@default='0x1p+0'">
-                            <xsl:text>1.0</xsl:text>
-                        </xsl:when>
+                        <xsl:when test="@default='0x1p+0'"><xsl:text>1.0</xsl:text></xsl:when>
+                        <xsl:when test="@default='0x0p+0'"><xsl:text>0.0</xsl:text></xsl:when>
+                        <xsl:when test="@default='0x1.f4p+12'"><xsl:text>8000.0</xsl:text></xsl:when>
                         <xsl:when test="@type='master'">
                             <xsl:value-of select="@default"/>
                         </xsl:when>
@@ -313,6 +368,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     </xsl:when>
                     <xsl:when test="@type='uinteger'">
                         <xsl:text>EBML_UINT,   </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@type='integer'">
+                        <xsl:text>EBML_SINT,   </xsl:text>
                     </xsl:when>
                     <xsl:when test="@type='utf-8'">
                         <xsl:text>EBML_UTF8,   </xsl:text>
@@ -495,6 +553,11 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>MatroskaTrackEncoding</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='TrackPlane'"><xsl:text>MatroskaTrackPlane</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Colour'"><xsl:text>MatroskaTrackVideoColor</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='CuePoint'"><xsl:text>MatroskaIndex</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='CueTrackPositions'"><xsl:text>MatroskaIndexPos</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Tags'"><xsl:text>MatroskaTags</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='AttachedFile'"><xsl:text>MatroskaAttachment</xsl:text></xsl:when>
+                    
                 </xsl:choose>
             </xsl:when>
         </xsl:choose>
@@ -508,12 +571,20 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:choose>
                     <xsl:when test="$node/@name='Info'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Tracks'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Cues'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Tags'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Attachments'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='TrackCombinePlanes'"><xsl:text>MatroskaTrackOperation</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='ContentEncryption'"><xsl:text>MatroskaTrackEncryption</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='ContentCompression'"><xsl:text>MatroskaTrackCompression</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='ContentEncodings'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Video'"><xsl:text>MatroskaTrackVideo</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Audio'"><xsl:text>MatroskaTrackAudio</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='MasteringMetadata'"><xsl:text>MatroskaMasteringMeta</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Projection'"><xsl:text>MatroskaTrackVideoProjection</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Cluster'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='BlockGroup'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
+                    
                 </xsl:choose>
             </xsl:when>
         </xsl:choose>
