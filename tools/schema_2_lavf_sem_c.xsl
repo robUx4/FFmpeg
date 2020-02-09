@@ -227,8 +227,6 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:when test="@type='master'">
                             <xsl:choose>
                                 <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
-                                <xsl:when test="@name='Video'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
-                                <xsl:when test="@name='Audio'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
                                 <xsl:otherwise>NONE</xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
@@ -249,6 +247,8 @@ static EbmlSyntax ebml_syntax[] = {
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
+<!-- <xsl:value-of select="$lavfDefault"/> -->
+
 
                 <!-- generate EbmlSyntax.id -->
                 <xsl:text>    { MATROSKA_ID_</xsl:text>
@@ -304,27 +304,30 @@ static EbmlSyntax ebml_syntax[] = {
                 <xsl:choose>
                     <xsl:when test="$lavfStorage='STOP'">
                     </xsl:when>
-                    <!-- <xsl:when test="@type='master'">
+                    <xsl:when test="$lavfMasterStructure='NONE' and not($lavfDefault='')">
                         <xsl:text>0, </xsl:text>
-                    </xsl:when> -->
-                    <xsl:when test="$lavfStorage='NONE'">
+                    </xsl:when>
+                    <xsl:when test="$lavfMasterStructure='NONE' and $lavfStorage='NONE'">
+                    </xsl:when>
+                    <xsl:when test="$lavfMasterStructure='NONE' and not($lavfStorage='')">
+                        <xsl:text>0, </xsl:text>
                     </xsl:when>
                     <xsl:when test="$lavfMasterStructure='NONE'">
-                        <xsl:text>0, </xsl:text>
                     </xsl:when>
-                    <xsl:otherwise>
+                    <xsl:when test="$lavfMasterStructure">
                         <xsl:text>sizeof(</xsl:text>
                         <xsl:value-of select="$lavfMasterStructure"/>
                         <xsl:text>), </xsl:text>
-                    </xsl:otherwise>
+                    </xsl:when>
                 </xsl:choose>
+<!-- <xsl:value-of select="$lavfMasterStructure"/><xsl:value-of select="$lavfStorage"/> -->
 
                 <!-- generate EbmlSyntax.data_offset -->
                 <xsl:choose>
-                    <!-- <xsl:when test="@type='master'">
-                        <xsl:text>0</xsl:text>
-                    </xsl:when> -->
                     <xsl:when test="$lavfStorage='STOP'">
+                    </xsl:when>
+                    <xsl:when test="$lavfStorage='NONE' and not($lavfDefault='')">
+                        <xsl:text>0</xsl:text>
                     </xsl:when>
                     <xsl:when test="$lavfStorage='NONE'">
                     </xsl:when>
@@ -338,8 +341,6 @@ static EbmlSyntax ebml_syntax[] = {
                 <!-- generate EbmlSyntax.def -->
                 <xsl:choose>
                     <xsl:when test="$lavfStorage='STOP'">
-                    </xsl:when>
-                    <xsl:when test="$lavfStorage='NONE'">
                     </xsl:when>
                     <xsl:when test="$lavfDefault=''">
                     </xsl:when>
