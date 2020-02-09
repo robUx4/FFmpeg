@@ -246,8 +246,6 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='Projection'"><xsl:text>MatroskaTrackVideo, projection</xsl:text></xsl:when>
                         <xsl:when test="@name='FrameRate'"><xsl:text>MatroskaTrackVideo, frame_rate</xsl:text></xsl:when>
                         <xsl:when test="@name='ColourSpace'"><xsl:text>MatroskaTrackVideo, color_space</xsl:text></xsl:when>
-                        
-                        <xsl:otherwise>NONE</xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
                 <!-- Structure name for master elements stored in an EbmlList -->
@@ -259,10 +257,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
                                 <xsl:when test="@name='ContentEncoding'"><xsl:text>MatroskaTrackEncoding</xsl:text></xsl:when>
                                 <xsl:when test="@name='TrackPlane'"><xsl:text>MatroskaTrackPlane</xsl:text></xsl:when>
                                 <xsl:when test="@name='Colour'"><xsl:text>MatroskaTrackVideoColor</xsl:text></xsl:when>
-                                <xsl:otherwise>NONE</xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
-                        <xsl:otherwise>NONE</xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
                 <!-- Default value to use -->
@@ -284,7 +280,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                             <xsl:value-of select="@default"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:if test="not($lavfStorage='NONE')">
+                            <xsl:if test="not($lavfStorage='')">
                                 <xsl:value-of select="@default"/>
                             </xsl:if>
                         </xsl:otherwise>
@@ -320,7 +316,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:when>
-                    <xsl:when test="$lavfStorage='NONE'">
+                    <xsl:when test="$lavfStorage=''">
                         <xsl:text>EBML_NONE,   </xsl:text>
                     </xsl:when>
                     <xsl:when test="@type='uinteger'">
@@ -347,15 +343,15 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:choose>
                     <xsl:when test="$lavfStorage='STOP'">
                     </xsl:when>
-                    <xsl:when test="$lavfListElementSize='NONE' and not($lavfDefault='')">
+                    <xsl:when test="$lavfListElementSize='' and not($lavfDefault='')">
                         <xsl:text>0, </xsl:text>
                     </xsl:when>
-                    <xsl:when test="$lavfListElementSize='NONE' and $lavfStorage='NONE'">
+                    <xsl:when test="$lavfListElementSize='' and $lavfStorage=''">
                     </xsl:when>
-                    <xsl:when test="$lavfListElementSize='NONE' and not($lavfStorage='')">
+                    <xsl:when test="$lavfListElementSize='' and not($lavfStorage='')">
                         <xsl:text>0, </xsl:text>
                     </xsl:when>
-                    <xsl:when test="$lavfListElementSize='NONE'">
+                    <xsl:when test="$lavfListElementSize=''">
                     </xsl:when>
                     <xsl:when test="$lavfListElementSize">
                         <xsl:text>sizeof(</xsl:text>
@@ -363,16 +359,15 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:text>), </xsl:text>
                     </xsl:when>
                 </xsl:choose>
-<!-- <xsl:value-of select="$lavfListElementSize"/><xsl:value-of select="$lavfStorage"/> -->
 
                 <!-- generate EbmlSyntax.data_offset -->
                 <xsl:choose>
                     <xsl:when test="$lavfStorage='STOP'">
                     </xsl:when>
-                    <xsl:when test="$lavfStorage='NONE' and not($lavfDefault='')">
+                    <xsl:when test="$lavfStorage='' and not($lavfDefault='')">
                         <xsl:text>0</xsl:text>
                     </xsl:when>
-                    <xsl:when test="$lavfStorage='NONE'">
+                    <xsl:when test="$lavfStorage=''">
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:text>offsetof(</xsl:text>
