@@ -74,10 +74,7 @@ static EbmlSyntax ebml_syntax[] = {
     <xsl:for-each select="ebml:element">
         <!-- <Parent path>/<id> -->
         <xsl:sort select="concat(
-            substring( translate(@path, '\+', '\'),
-                    1, 
-                    string-length(translate(@path, '\+', '\'))-string-length(@name)
-                    ),
+            substring( @path, 1, string-length(@path)-string-length(@name) ),
             @id
         )" />
 
@@ -192,25 +189,72 @@ static EbmlSyntax ebml_syntax[] = {
                 <xsl:variable name="lavfNameUpper">
                     <xsl:value-of select="translate($lavfName, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
                 </xsl:variable>
+                <!-- Storage name in a structure if any -->
+                <xsl:variable name="lavfStorage">
+                    <xsl:choose>
+                        <xsl:when test="@name='Cluster'"><xsl:text>STOP</xsl:text></xsl:when>
+                        <xsl:when test="@name='TimestampScale'"><xsl:text>MatroskaDemuxContext, time_scale</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaDemuxContext, tracks</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackNumber'"><xsl:text>MatroskaTrack, num</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackName'"><xsl:text>MatroskaTrack, name</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackUID'"><xsl:text>MatroskaTrack, uid</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackType'"><xsl:text>MatroskaTrack, type</xsl:text></xsl:when>
+                        <xsl:when test="@name='CodecID'"><xsl:text>MatroskaTrack, codec_id</xsl:text></xsl:when>
+                        <xsl:when test="@name='FlagDefault'"><xsl:text>MatroskaTrack, flag_default</xsl:text></xsl:when>
+                        <xsl:otherwise>NONE</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <!-- Structure name for master elements -->
+                <xsl:variable name="lavfMasterStructure">
+                    <xsl:choose>
+                        <xsl:when test="@type='master'">
+                            <xsl:choose>
+                                <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                                <xsl:otherwise>NONE</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>NONE</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+
+                <!-- generate EbmlSyntax.id -->
                 <xsl:text>    { MATROSKA_ID_</xsl:text>
                 <xsl:choose>
                     <xsl:when test="string-length($lavfNameUpper) &lt; 18">
-                        <xsl:value-of select="substring(concat($lavfNameUpper, ',                          '),0,17)"/>
+                        <xsl:value-of select="substring(concat($lavfNameUpper, ',                                   '),0,26)"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="$lavfNameUpper"/><xsl:text>,</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:text> </xsl:text>
+
+                <!-- generate EbmlSyntax.type -->
                 <xsl:choose>
+                    <xsl:when test="@name='Cluster'">
+                        <xsl:text>EBML_STOP,   </xsl:text>
+                    </xsl:when>
                     <xsl:when test="@type='master'">
-                        <xsl:text>EBML_LEVEL1, </xsl:text>
+                        <xsl:choose>
+                            <xsl:when test="$masterName='Segment'">
+                                <xsl:text>EBML_LEVEL1, </xsl:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>EBML_NEST,   </xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:when test="$lavfStorage='NONE'">
+                        <xsl:text>EBML_NONE,   </xsl:text>
                     </xsl:when>
                     <xsl:when test="@type='uinteger'">
                         <xsl:text>EBML_UINT,   </xsl:text>
                     </xsl:when>
                     <xsl:when test="@type='utf-8'">
                         <xsl:text>EBML_UTF8,   </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@type='string'">
+                        <xsl:text>EBML_STR,    </xsl:text>
                     </xsl:when>
                     <xsl:when test="@type='binary'">
                         <xsl:text>EBML_BIN,    </xsl:text>
@@ -222,8 +266,63 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:text>EBML_FLOAT,    </xsl:text>
                     </xsl:when>
                 </xsl:choose>
-                <xsl:text>0 </xsl:text>
-                <xsl:text>&#10;</xsl:text>
+
+                <!-- generate EbmlSyntax.list_elem_size -->
+                <xsl:choose>
+                    <xsl:when test="$lavfMasterStructure='NONE'">
+                        <xsl:text>0, </xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>sizeof(</xsl:text>
+                        <xsl:value-of select="$lavfMasterStructure"/>
+                        <xsl:text>), </xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+                <!-- generate EbmlSyntax.data_offset -->
+                <xsl:choose>
+                    <xsl:when test="$lavfStorage='NONE'">
+                        <xsl:text>0</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="$lavfStorage='STOP'">
+                        <xsl:text>0</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>offsetof(</xsl:text>
+                        <xsl:value-of select="$lavfStorage"/>
+                        <xsl:text>)</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+                <!-- generate EbmlSyntax.def -->
+                <xsl:choose>
+                    <xsl:when test="@type='master'">
+                        <xsl:text>, { </xsl:text>
+                        <xsl:text>.n = matroska_</xsl:text>
+                        <xsl:value-of select="translate(@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+                        <xsl:text> }</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="not(@default)">
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>, { </xsl:text>
+                        <xsl:choose>
+                            <xsl:when test="@type='uinteger'">
+                                <xsl:text>.u = </xsl:text>
+                            </xsl:when>
+                            <xsl:when test="@type='integer'">
+                                <xsl:text>.i = </xsl:text>
+                            </xsl:when>
+                            <xsl:when test="@type='float'">
+                                <xsl:text>.f = </xsl:text>
+                            </xsl:when>
+                        </xsl:choose>
+                        <xsl:value-of select="@default"/>
+                        <xsl:text> }</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+                <xsl:text> },&#10;</xsl:text>
                 <xsl:if test="@name='TagDefault'"><xsl:text>#define MATROSKA_ID_TAGDEFAULT_BUG            0x44B4&#10;</xsl:text></xsl:if>
             </xsl:for-each>
             <xsl:choose>
