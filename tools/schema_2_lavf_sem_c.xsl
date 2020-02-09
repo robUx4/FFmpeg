@@ -250,16 +250,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 </xsl:variable>
                 <!-- Structure name for master elements stored in an EbmlList -->
                 <xsl:variable name="lavfListElementSize">
-                    <xsl:choose>
-                        <xsl:when test="@type='master'">
-                            <xsl:choose>
-                                <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
-                                <xsl:when test="@name='ContentEncoding'"><xsl:text>MatroskaTrackEncoding</xsl:text></xsl:when>
-                                <xsl:when test="@name='TrackPlane'"><xsl:text>MatroskaTrackPlane</xsl:text></xsl:when>
-                                <xsl:when test="@name='Colour'"><xsl:text>MatroskaTrackVideoColor</xsl:text></xsl:when>
-                            </xsl:choose>
-                        </xsl:when>
-                    </xsl:choose>
+                    <xsl:call-template name="ebmlListStructure">
+                        <xsl:with-param name="node" select="."/>
+                    </xsl:call-template>
                 </xsl:variable>
                 <!-- Default value to use -->
                 <xsl:variable name="lavfDefault">
@@ -286,7 +279,6 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-<!-- <xsl:value-of select="$lavfDefault"/> -->
 
 
                 <!-- generate EbmlSyntax.id -->
@@ -466,37 +458,19 @@ static EbmlSyntax matroska_cluster_enter[] = {
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="ConvertDecToHex">
-        <xsl:param name="index" />
-        <xsl:if test="$index > 0">
-        <xsl:call-template name="ConvertDecToHex">
-            <xsl:with-param name="index" select="floor($index div 16)" />
-        </xsl:call-template>
+    <!-- Type of elements stored in an EbmlList -->
+    <xsl:template name="ebmlListStructure">
+        <xsl:param name="node"/>
         <xsl:choose>
-            <xsl:when test="$index mod 16 &lt; 10">
-                <xsl:value-of select="$index mod 16" />
+            <xsl:when test="$node/@type='master'">
+                <xsl:choose>
+                    <xsl:when test="$node/@name='TrackEntry'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>MatroskaTrackEncoding</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='TrackPlane'"><xsl:text>MatroskaTrackPlane</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Colour'"><xsl:text>MatroskaTrackVideoColor</xsl:text></xsl:when>
+                </xsl:choose>
             </xsl:when>
-            <xsl:otherwise>
-            <xsl:choose>
-                <xsl:when test="$index mod 16 = 10">A</xsl:when>
-                <xsl:when test="$index mod 16 = 11">B</xsl:when>
-                <xsl:when test="$index mod 16 = 12">C</xsl:when>
-                <xsl:when test="$index mod 16 = 13">D</xsl:when>
-                <xsl:when test="$index mod 16 = 14">E</xsl:when>
-                <xsl:when test="$index mod 16 = 15">F</xsl:when>
-                <xsl:otherwise>A</xsl:otherwise>
-            </xsl:choose>
-            </xsl:otherwise>
         </xsl:choose>
-        </xsl:if>
-    </xsl:template>
-
-    <xsl:template name="ConvertToHex">
-        <xsl:param name="index" />
-        <xsl:text>0x</xsl:text>
-        <xsl:call-template name="ConvertDecToHex">
-            <xsl:with-param name="index" select="$index" />
-        </xsl:call-template>
     </xsl:template>
 
 </xsl:stylesheet>
