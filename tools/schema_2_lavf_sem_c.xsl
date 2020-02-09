@@ -196,56 +196,56 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <!-- Storage name in a structure if any -->
                 <xsl:variable name="lavfStorage">
                     <xsl:choose>
-                        <xsl:when test="@name='DateUTC'"><xsl:text>MatroskaDemuxContext, date_utc</xsl:text></xsl:when>
-                        <xsl:when test="@name='Duration'"><xsl:text>MatroskaDemuxContext, duration</xsl:text></xsl:when>
-                        <xsl:when test="@name='MuxingApp'"><xsl:text>MatroskaDemuxContext, muxingapp</xsl:text></xsl:when>
-                        <xsl:when test="@name='Title'"><xsl:text>MatroskaDemuxContext, title</xsl:text></xsl:when>
+                        <xsl:when test="@name='DateUTC'"><xsl:text>date_utc</xsl:text></xsl:when>
+                        <xsl:when test="@name='Duration'"><xsl:text>duration</xsl:text></xsl:when>
+                        <xsl:when test="@name='MuxingApp'"><xsl:text>muxingapp</xsl:text></xsl:when>
+                        <xsl:when test="@name='Title'"><xsl:text>title</xsl:text></xsl:when>
                         <xsl:when test="@name='Cluster'"><xsl:text>STOP</xsl:text></xsl:when>
-                        <xsl:when test="@name='TimestampScale'"><xsl:text>MatroskaDemuxContext, time_scale</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaDemuxContext, tracks</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackNumber'"><xsl:text>MatroskaTrack, num</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackName'"><xsl:text>MatroskaTrack, name</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackUID'"><xsl:text>MatroskaTrack, uid</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackType'"><xsl:text>MatroskaTrack, type</xsl:text></xsl:when>
-                        <xsl:when test="@name='CodecID'"><xsl:text>MatroskaTrack, codec_id</xsl:text></xsl:when>
-                        <xsl:when test="@name='FlagDefault'"><xsl:text>MatroskaTrack, flag_default</xsl:text></xsl:when>
-                        <xsl:when test="@name='FlagForced'"><xsl:text>MatroskaTrack, flag_forced</xsl:text></xsl:when>
-                        <xsl:when test="@name='CodecDelay'"><xsl:text>MatroskaTrack, codec_delay</xsl:text></xsl:when>
-                        <xsl:when test="@name='CodecPrivate'"><xsl:text>MatroskaTrack, codec_priv</xsl:text></xsl:when>
-                        <xsl:when test="@name='SeekPreRoll'"><xsl:text>MatroskaTrack, seek_preroll</xsl:text></xsl:when>
-                        <xsl:when test="@name='Video'"><xsl:text>MatroskaTrack, video</xsl:text></xsl:when>
-                        <xsl:when test="@name='Audio'"><xsl:text>MatroskaTrack, audio</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackOperation'"><xsl:text>MatroskaTrack, operation</xsl:text></xsl:when>
-                        <xsl:when test="@name='Name'"><xsl:text>MatroskaTrack, name</xsl:text></xsl:when>
-                        <xsl:when test="@name='MaxBlockAdditionID'"><xsl:text>MatroskaTrack, max_block_additional_id</xsl:text></xsl:when>
-                        <xsl:when test="@name='Language'"><xsl:text>MatroskaTrack, language</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackTimestampScale'"><xsl:text>MatroskaTrack, time_scale</xsl:text></xsl:when>
-                        <xsl:when test="@name='DefaultDuration'"><xsl:text>MatroskaTrack, default_duration</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentEncoding'"><xsl:text>MatroskaTrack, encodings</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentEncodingScope'"><xsl:text>MatroskaTrackEncoding, scope</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentEncodingType'"><xsl:text>MatroskaTrackEncoding, type</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentCompression'"><xsl:text>MatroskaTrackEncoding, compression</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentEncryption'"><xsl:text>MatroskaTrackEncoding, encryption</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentCompAlgo'"><xsl:text>MatroskaTrackCompression, algo</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentCompSettings'"><xsl:text>MatroskaTrackCompression, settings</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentEncAlgo'"><xsl:text>MatroskaTrackEncryption,algo</xsl:text></xsl:when>
-                        <xsl:when test="@name='ContentEncKeyID'"><xsl:text>MatroskaTrackEncryption,key_id</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackPlane'"><xsl:text>MatroskaTrackOperation, combine_planes</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackPlaneUID'"><xsl:text>MatroskaTrackPlane, uid</xsl:text></xsl:when>
-                        <xsl:when test="@name='TrackPlaneType'"><xsl:text>MatroskaTrackPlane, type</xsl:text></xsl:when>
-                        <xsl:when test="@name='FlagInterlaced'"><xsl:text>MatroskaTrackVideo, interlaced</xsl:text></xsl:when>
-                        <xsl:when test="@name='FieldOrder'"><xsl:text>MatroskaTrackVideo, field_order</xsl:text></xsl:when>
-                        <xsl:when test="@name='PixelWidth'"><xsl:text>MatroskaTrackVideo, pixel_width</xsl:text></xsl:when>
-                        <xsl:when test="@name='PixelHeight'"><xsl:text>MatroskaTrackVideo, pixel_height</xsl:text></xsl:when>
-                        <xsl:when test="@name='StereoMode'"><xsl:text>MatroskaTrackVideo, stereo_mode</xsl:text></xsl:when>
-                        <xsl:when test="@name='AlphaMode'"><xsl:text>MatroskaTrackVideo, alpha_mode</xsl:text></xsl:when>
-                        <xsl:when test="@name='DisplayWidth'"><xsl:text>MatroskaTrackVideo, display_width</xsl:text></xsl:when>
-                        <xsl:when test="@name='DisplayHeight'"><xsl:text>MatroskaTrackVideo, display_height</xsl:text></xsl:when>
-                        <xsl:when test="@name='DisplayUnit'"><xsl:text>MatroskaTrackVideo, display_unit</xsl:text></xsl:when>
-                        <xsl:when test="@name='Colour'"><xsl:text>MatroskaTrackVideo, color</xsl:text></xsl:when>
-                        <xsl:when test="@name='Projection'"><xsl:text>MatroskaTrackVideo, projection</xsl:text></xsl:when>
-                        <xsl:when test="@name='FrameRate'"><xsl:text>MatroskaTrackVideo, frame_rate</xsl:text></xsl:when>
-                        <xsl:when test="@name='ColourSpace'"><xsl:text>MatroskaTrackVideo, color_space</xsl:text></xsl:when>
+                        <xsl:when test="@name='TimestampScale'"><xsl:text>time_scale</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackEntry'"><xsl:text>tracks</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackNumber'"><xsl:text>num</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackName'"><xsl:text>name</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackUID'"><xsl:text>uid</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackType'"><xsl:text>type</xsl:text></xsl:when>
+                        <xsl:when test="@name='CodecID'"><xsl:text>codec_id</xsl:text></xsl:when>
+                        <xsl:when test="@name='FlagDefault'"><xsl:text>flag_default</xsl:text></xsl:when>
+                        <xsl:when test="@name='FlagForced'"><xsl:text>flag_forced</xsl:text></xsl:when>
+                        <xsl:when test="@name='CodecDelay'"><xsl:text>codec_delay</xsl:text></xsl:when>
+                        <xsl:when test="@name='CodecPrivate'"><xsl:text>codec_priv</xsl:text></xsl:when>
+                        <xsl:when test="@name='SeekPreRoll'"><xsl:text>seek_preroll</xsl:text></xsl:when>
+                        <xsl:when test="@name='Video'"><xsl:text>video</xsl:text></xsl:when>
+                        <xsl:when test="@name='Audio'"><xsl:text>audio</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackOperation'"><xsl:text>operation</xsl:text></xsl:when>
+                        <xsl:when test="@name='Name'"><xsl:text>name</xsl:text></xsl:when>
+                        <xsl:when test="@name='MaxBlockAdditionID'"><xsl:text>max_block_additional_id</xsl:text></xsl:when>
+                        <xsl:when test="@name='Language'"><xsl:text>language</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackTimestampScale'"><xsl:text>time_scale</xsl:text></xsl:when>
+                        <xsl:when test="@name='DefaultDuration'"><xsl:text>default_duration</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncoding'"><xsl:text>encodings</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncodingScope'"><xsl:text>scope</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncodingType'"><xsl:text>type</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentCompression'"><xsl:text>compression</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncryption'"><xsl:text>encryption</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentCompAlgo'"><xsl:text>algo</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentCompSettings'"><xsl:text>settings</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncAlgo'"><xsl:text>algo</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncKeyID'"><xsl:text>key_id</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackPlane'"><xsl:text>combine_planes</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackPlaneUID'"><xsl:text>uid</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackPlaneType'"><xsl:text>type</xsl:text></xsl:when>
+                        <xsl:when test="@name='FlagInterlaced'"><xsl:text>interlaced</xsl:text></xsl:when>
+                        <xsl:when test="@name='FieldOrder'"><xsl:text>field_order</xsl:text></xsl:when>
+                        <xsl:when test="@name='PixelWidth'"><xsl:text>pixel_width</xsl:text></xsl:when>
+                        <xsl:when test="@name='PixelHeight'"><xsl:text>pixel_height</xsl:text></xsl:when>
+                        <xsl:when test="@name='StereoMode'"><xsl:text>stereo_mode</xsl:text></xsl:when>
+                        <xsl:when test="@name='AlphaMode'"><xsl:text>alpha_mode</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayWidth'"><xsl:text>display_width</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayHeight'"><xsl:text>display_height</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayUnit'"><xsl:text>display_unit</xsl:text></xsl:when>
+                        <xsl:when test="@name='Colour'"><xsl:text>color</xsl:text></xsl:when>
+                        <xsl:when test="@name='Projection'"><xsl:text>projection</xsl:text></xsl:when>
+                        <xsl:when test="@name='FrameRate'"><xsl:text>frame_rate</xsl:text></xsl:when>
+                        <xsl:when test="@name='ColourSpace'"><xsl:text>color_space</xsl:text></xsl:when>
                     </xsl:choose>
                 </xsl:variable>
                 <!-- Structure name for master elements stored in an EbmlList -->
@@ -362,7 +362,34 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$lavfStorage=''">
                     </xsl:when>
                     <xsl:otherwise>
+                        <xsl:variable name="parentFullPath" select="substring(@path, 0, string-length(@path)-string-length(@name))"/>
+                    
+                        <!-- <xsl:variable name="parentNode" select="../ebml:element[@path = $parentFullPath]"/> -->
+<!-- <xsl:value-of select="$parentFullPath"/> -->
+<!-- <xsl:value-of select="$parentNode/@name"/> -->
+
+                        <xsl:variable name="parentStructureFromList">
+                            <xsl:call-template name="ebmlListStructure">
+                                <xsl:with-param name="node" select="../ebml:element[@path = $parentFullPath]"/>
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:variable name="parentStructure">
+                            <xsl:choose>
+                                <xsl:when test="not($parentStructureFromList='')">
+                                    <xsl:value-of select="$parentStructureFromList"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:call-template name="hardcodedStructure">
+                                        <xsl:with-param name="node" select="../ebml:element[@path = $parentFullPath]"/>
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
+<!-- <xsl:value-of select="$parentStructure"/> -->
+
                         <xsl:text>offsetof(</xsl:text>
+                        <xsl:value-of select="$parentStructure"/>
+                        <xsl:text>, </xsl:text>
                         <xsl:value-of select="$lavfStorage"/>
                         <xsl:text>)</xsl:text>
                     </xsl:otherwise>
@@ -468,6 +495,25 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>MatroskaTrackEncoding</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='TrackPlane'"><xsl:text>MatroskaTrackPlane</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Colour'"><xsl:text>MatroskaTrackVideoColor</xsl:text></xsl:when>
+                </xsl:choose>
+            </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- Type of elements stored in an Structure -->
+    <xsl:template name="hardcodedStructure">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/@type='master'">
+                <xsl:choose>
+                    <xsl:when test="$node/@name='Info'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Tracks'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='TrackCombinePlanes'"><xsl:text>MatroskaTrackOperation</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='ContentEncryption'"><xsl:text>MatroskaTrackEncryption</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='ContentCompression'"><xsl:text>MatroskaTrackCompression</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='ContentEncodings'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Video'"><xsl:text>MatroskaTrackVideo</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Audio'"><xsl:text>MatroskaTrackAudio</xsl:text></xsl:when>
                 </xsl:choose>
             </xsl:when>
         </xsl:choose>
