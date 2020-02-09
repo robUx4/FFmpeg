@@ -81,7 +81,15 @@ static EbmlSyntax ebml_syntax[] = {
     </xsl:for-each>
 
 <xsl:text>
-#endif /* AVFORMAT_MATROSKASEM_H */
+static EbmlSyntax matroska_segments[] = {
+    { MATROSKA_ID_SEGMENT, EBML_NEST, 0, 0, { .n = matroska_segment } },
+    { 0 }
+};
+
+static EbmlSyntax matroska_cluster_enter[] = {
+    { MATROSKA_ID_CLUSTER,     EBML_NEST, 0, 0, { .n = &amp;matroska_cluster_parsing[2] } },
+    { 0 }
+};
 </xsl:text>
 
   </xsl:template>
@@ -94,9 +102,6 @@ static EbmlSyntax ebml_syntax[] = {
 
     <xsl:template name="parsePath">
         <xsl:param name="node"/>
-        <xsl:variable name="plainPath">
-            <xsl:value-of select="translate($node/@path, '\+', '\')" />
-        </xsl:variable>
         <xsl:variable name="masterName">
             <xsl:choose>
                 <xsl:when test="$node/@name='CuePoint'"><xsl:text>PointEntry</xsl:text></xsl:when>
@@ -110,12 +115,11 @@ static EbmlSyntax ebml_syntax[] = {
 
         <!-- Master element comment header -->
         <xsl:if test="@type='master'">
-            <xsl:text>&#10;static EbmlSyntax </xsl:text>
-            <xsl:text>matroska_</xsl:text>
+            <xsl:text>&#10;static EbmlSyntax matroska_</xsl:text>
             <xsl:value-of select="translate($masterName, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
             <xsl:text>[] = {&#10;</xsl:text>
 
-            <xsl:for-each select="/ebml:EBMLSchema/ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
+            <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)]">
                 <xsl:sort select="not(@name='Info')" />
                 <xsl:sort select="not(@name='Tracks')" />
                 <xsl:sort select="not(@name='Cues')" />
@@ -217,6 +221,31 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:when test="@name='Language'"><xsl:text>MatroskaTrack, language</xsl:text></xsl:when>
                         <xsl:when test="@name='TrackTimestampScale'"><xsl:text>MatroskaTrack, time_scale</xsl:text></xsl:when>
                         <xsl:when test="@name='DefaultDuration'"><xsl:text>MatroskaTrack, default_duration</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncoding'"><xsl:text>MatroskaTrack, encodings</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncodingScope'"><xsl:text>MatroskaTrackEncoding, scope</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncodingType'"><xsl:text>MatroskaTrackEncoding, type</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentCompression'"><xsl:text>MatroskaTrackEncoding, compression</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncryption'"><xsl:text>MatroskaTrackEncoding, encryption</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentCompAlgo'"><xsl:text>MatroskaTrackCompression, algo</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentCompSettings'"><xsl:text>MatroskaTrackCompression, settings</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncAlgo'"><xsl:text>MatroskaTrackEncryption,algo</xsl:text></xsl:when>
+                        <xsl:when test="@name='ContentEncKeyID'"><xsl:text>MatroskaTrackEncryption,key_id</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackPlane'"><xsl:text>MatroskaTrackOperation, combine_planes</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackPlaneUID'"><xsl:text>MatroskaTrackPlane, uid</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackPlaneType'"><xsl:text>MatroskaTrackPlane, type</xsl:text></xsl:when>
+                        <xsl:when test="@name='FlagInterlaced'"><xsl:text>MatroskaTrackVideo, interlaced</xsl:text></xsl:when>
+                        <xsl:when test="@name='FieldOrder'"><xsl:text>MatroskaTrackVideo, field_order</xsl:text></xsl:when>
+                        <xsl:when test="@name='PixelWidth'"><xsl:text>MatroskaTrackVideo, pixel_width</xsl:text></xsl:when>
+                        <xsl:when test="@name='PixelHeight'"><xsl:text>MatroskaTrackVideo, pixel_height</xsl:text></xsl:when>
+                        <xsl:when test="@name='StereoMode'"><xsl:text>MatroskaTrackVideo, stereo_mode</xsl:text></xsl:when>
+                        <xsl:when test="@name='AlphaMode'"><xsl:text>MatroskaTrackVideo, alpha_mode</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayWidth'"><xsl:text>MatroskaTrackVideo, display_width</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayHeight'"><xsl:text>MatroskaTrackVideo, display_height</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayUnit'"><xsl:text>MatroskaTrackVideo, display_unit</xsl:text></xsl:when>
+                        <xsl:when test="@name='Colour'"><xsl:text>MatroskaTrackVideo, color</xsl:text></xsl:when>
+                        <xsl:when test="@name='Projection'"><xsl:text>MatroskaTrackVideo, projection</xsl:text></xsl:when>
+                        <xsl:when test="@name='FrameRate'"><xsl:text>MatroskaTrackVideo, frame_rate</xsl:text></xsl:when>
+                        <xsl:when test="@name='ColourSpace'"><xsl:text>MatroskaTrackVideo, color_space</xsl:text></xsl:when>
                         
                         <xsl:otherwise>NONE</xsl:otherwise>
                     </xsl:choose>
@@ -227,6 +256,9 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:when test="@type='master'">
                             <xsl:choose>
                                 <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                                <xsl:when test="@name='ContentEncoding'"><xsl:text>MatroskaTrackEncoding</xsl:text></xsl:when>
+                                <xsl:when test="@name='TrackPlane'"><xsl:text>MatroskaTrackPlane</xsl:text></xsl:when>
+                                <xsl:when test="@name='Colour'"><xsl:text>MatroskaTrackVideoColor</xsl:text></xsl:when>
                                 <xsl:otherwise>NONE</xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
@@ -239,11 +271,22 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:when test="@type='master'">
                             <xsl:text>matroska_</xsl:text><xsl:value-of select="translate(@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
                         </xsl:when>
+                        <xsl:when test="@name='FlagInterlaced'"><xsl:text>MATROSKA_VIDEO_INTERLACE_FLAG_UNDETERMINED</xsl:text></xsl:when>
+                        <xsl:when test="@name='FieldOrder'"><xsl:text>MATROSKA_VIDEO_FIELDORDER_UNDETERMINED</xsl:text></xsl:when>
+                        <xsl:when test="@name='StereoMode'"><xsl:text>MATROSKA_VIDEO_STEREOMODE_TYPE_NB</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayWidth'"><xsl:text>-1</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayHeight'"><xsl:text>-1</xsl:text></xsl:when>
+                        <xsl:when test="@name='DisplayUnit'"><xsl:text>MATROSKA_VIDEO_DISPLAYUNIT_PIXELS</xsl:text></xsl:when>
                         <xsl:when test="@default='0x1p+0'">
                             <xsl:text>1.0</xsl:text>
                         </xsl:when>
-                        <xsl:otherwise>
+                        <xsl:when test="@type='master'">
                             <xsl:value-of select="@default"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:if test="not($lavfStorage='NONE')">
+                                <xsl:value-of select="@default"/>
+                            </xsl:if>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
@@ -380,7 +423,6 @@ static EbmlSyntax ebml_syntax[] = {
                 </xsl:choose>
 
                 <xsl:text> },&#10;</xsl:text>
-                <xsl:if test="@name='TagDefault'"><xsl:text>#define MATROSKA_ID_TAGDEFAULT_BUG            0x44B4&#10;</xsl:text></xsl:if>
             </xsl:for-each>
             <xsl:choose>
                 <xsl:when test="@name='Segment'">
@@ -389,14 +431,14 @@ static EbmlSyntax ebml_syntax[] = {
                 <xsl:otherwise>
                     <xsl:text>    CHILD_OF(matroska_</xsl:text>
                     <xsl:call-template name="parentName">
-                        <xsl:with-param name="pText" select="substring($plainPath, 0, string-length($plainPath)-string-length(@name))"/>
+                        <xsl:with-param name="pText" select="substring($node/@path, 0, string-length($node/@path)-string-length(@name))"/>
                     </xsl:call-template>
                     <xsl:text>)&#10;</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:text>};&#10;</xsl:text>
 
-            <xsl:for-each select="../ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
+            <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)]">
                 <xsl:sort select="not(@name='Info')" />
                 <xsl:sort select="not(@name='Tracks')" />
                 <xsl:sort select="not(@name='Cues')" />
