@@ -227,12 +227,26 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:when test="@type='master'">
                             <xsl:choose>
                                 <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
-                                <xsl:when test="@name='TrackVideo'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
-                                <xsl:when test="@name='TrackAudio'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                                <xsl:when test="@name='Video'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                                <xsl:when test="@name='Audio'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
                                 <xsl:otherwise>NONE</xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>NONE</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <!-- Default value to use -->
+                <xsl:variable name="lavfDefault">
+                    <xsl:choose>
+                        <xsl:when test="@type='master'">
+                            <xsl:text>matroska_</xsl:text><xsl:value-of select="translate(@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+                        </xsl:when>
+                        <xsl:when test="@default='0x1p+0'">
+                            <xsl:text>1.0</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="@default"/>
+                        </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
 
@@ -282,12 +296,19 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:text>EBML_BIN,    </xsl:text>
                     </xsl:when>
                     <xsl:when test="@type='float'">
-                        <xsl:text>EBML_FLOAT,    </xsl:text>
+                        <xsl:text>EBML_FLOAT,  </xsl:text>
                     </xsl:when>
                 </xsl:choose>
 
                 <!-- generate EbmlSyntax.list_elem_size -->
                 <xsl:choose>
+                    <xsl:when test="$lavfStorage='STOP'">
+                    </xsl:when>
+                    <!-- <xsl:when test="@type='master'">
+                        <xsl:text>0, </xsl:text>
+                    </xsl:when> -->
+                    <xsl:when test="$lavfStorage='NONE'">
+                    </xsl:when>
                     <xsl:when test="$lavfMasterStructure='NONE'">
                         <xsl:text>0, </xsl:text>
                     </xsl:when>
@@ -300,11 +321,12 @@ static EbmlSyntax ebml_syntax[] = {
 
                 <!-- generate EbmlSyntax.data_offset -->
                 <xsl:choose>
-                    <xsl:when test="$lavfStorage='NONE'">
+                    <!-- <xsl:when test="@type='master'">
                         <xsl:text>0</xsl:text>
-                    </xsl:when>
+                    </xsl:when> -->
                     <xsl:when test="$lavfStorage='STOP'">
-                        <xsl:text>0</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="$lavfStorage='NONE'">
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:text>offsetof(</xsl:text>
@@ -315,13 +337,11 @@ static EbmlSyntax ebml_syntax[] = {
 
                 <!-- generate EbmlSyntax.def -->
                 <xsl:choose>
-                    <xsl:when test="@type='master'">
-                        <xsl:text>, { </xsl:text>
-                        <xsl:text>.n = matroska_</xsl:text>
-                        <xsl:value-of select="translate(@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
-                        <xsl:text> }</xsl:text>
+                    <xsl:when test="$lavfStorage='STOP'">
                     </xsl:when>
-                    <xsl:when test="not(@default)">
+                    <xsl:when test="$lavfStorage='NONE'">
+                    </xsl:when>
+                    <xsl:when test="$lavfDefault=''">
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:text>, { </xsl:text>
@@ -341,15 +361,11 @@ static EbmlSyntax ebml_syntax[] = {
                             <xsl:when test="@type='utf-8'">
                                 <xsl:text>.s = "</xsl:text>
                             </xsl:when>
-                        </xsl:choose>
-                        <xsl:choose>
-                            <xsl:when test="@default='0x1p+0'">
-                                <xsl:text>1.0</xsl:text>
+                            <xsl:when test="@type='master'">
+                                <xsl:text>.n = </xsl:text>
                             </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="@default"/>
-                            </xsl:otherwise>
                         </xsl:choose>
+                        <xsl:value-of select="$lavfDefault"/>
                         <xsl:choose>
                             <xsl:when test="@type='string'">
                                 <xsl:text>"</xsl:text>
