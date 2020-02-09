@@ -192,6 +192,10 @@ static EbmlSyntax ebml_syntax[] = {
                 <!-- Storage name in a structure if any -->
                 <xsl:variable name="lavfStorage">
                     <xsl:choose>
+                        <xsl:when test="@name='DateUTC'"><xsl:text>MatroskaDemuxContext, date_utc</xsl:text></xsl:when>
+                        <xsl:when test="@name='Duration'"><xsl:text>MatroskaDemuxContext, duration</xsl:text></xsl:when>
+                        <xsl:when test="@name='MuxingApp'"><xsl:text>MatroskaDemuxContext, muxingapp</xsl:text></xsl:when>
+                        <xsl:when test="@name='Title'"><xsl:text>MatroskaDemuxContext, title</xsl:text></xsl:when>
                         <xsl:when test="@name='Cluster'"><xsl:text>STOP</xsl:text></xsl:when>
                         <xsl:when test="@name='TimestampScale'"><xsl:text>MatroskaDemuxContext, time_scale</xsl:text></xsl:when>
                         <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaDemuxContext, tracks</xsl:text></xsl:when>
@@ -201,6 +205,19 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:when test="@name='TrackType'"><xsl:text>MatroskaTrack, type</xsl:text></xsl:when>
                         <xsl:when test="@name='CodecID'"><xsl:text>MatroskaTrack, codec_id</xsl:text></xsl:when>
                         <xsl:when test="@name='FlagDefault'"><xsl:text>MatroskaTrack, flag_default</xsl:text></xsl:when>
+                        <xsl:when test="@name='FlagForced'"><xsl:text>MatroskaTrack, flag_forced</xsl:text></xsl:when>
+                        <xsl:when test="@name='CodecDelay'"><xsl:text>MatroskaTrack, codec_delay</xsl:text></xsl:when>
+                        <xsl:when test="@name='CodecPrivate'"><xsl:text>MatroskaTrack, codec_priv</xsl:text></xsl:when>
+                        <xsl:when test="@name='SeekPreRoll'"><xsl:text>MatroskaTrack, seek_preroll</xsl:text></xsl:when>
+                        <xsl:when test="@name='Video'"><xsl:text>MatroskaTrack, video</xsl:text></xsl:when>
+                        <xsl:when test="@name='Audio'"><xsl:text>MatroskaTrack, audio</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackOperation'"><xsl:text>MatroskaTrack, operation</xsl:text></xsl:when>
+                        <xsl:when test="@name='Name'"><xsl:text>MatroskaTrack, name</xsl:text></xsl:when>
+                        <xsl:when test="@name='MaxBlockAdditionID'"><xsl:text>MatroskaTrack, max_block_additional_id</xsl:text></xsl:when>
+                        <xsl:when test="@name='Language'"><xsl:text>MatroskaTrack, language</xsl:text></xsl:when>
+                        <xsl:when test="@name='TrackTimestampScale'"><xsl:text>MatroskaTrack, time_scale</xsl:text></xsl:when>
+                        <xsl:when test="@name='DefaultDuration'"><xsl:text>MatroskaTrack, default_duration</xsl:text></xsl:when>
+                        
                         <xsl:otherwise>NONE</xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
@@ -210,6 +227,8 @@ static EbmlSyntax ebml_syntax[] = {
                         <xsl:when test="@type='master'">
                             <xsl:choose>
                                 <xsl:when test="@name='TrackEntry'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                                <xsl:when test="@name='TrackVideo'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
+                                <xsl:when test="@name='TrackAudio'"><xsl:text>MatroskaTrack</xsl:text></xsl:when>
                                 <xsl:otherwise>NONE</xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
@@ -316,8 +335,29 @@ static EbmlSyntax ebml_syntax[] = {
                             <xsl:when test="@type='float'">
                                 <xsl:text>.f = </xsl:text>
                             </xsl:when>
+                            <xsl:when test="@type='string'">
+                                <xsl:text>.s = "</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="@type='utf-8'">
+                                <xsl:text>.s = "</xsl:text>
+                            </xsl:when>
                         </xsl:choose>
-                        <xsl:value-of select="@default"/>
+                        <xsl:choose>
+                            <xsl:when test="@default='0x1p+0'">
+                                <xsl:text>1.0</xsl:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="@default"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="@type='string'">
+                                <xsl:text>"</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="@type='utf-8'">
+                                <xsl:text>"</xsl:text>
+                            </xsl:when>
+                        </xsl:choose>
                         <xsl:text> }</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
