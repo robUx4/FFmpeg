@@ -1,5 +1,6 @@
 /*
  * Matroska Semantic constants
+ *  DO NOT EDIT, GENERATED WITH schema_2_lavf_h.xsl
  *
  * Copyright (c) 2003-2004 The FFmpeg project
  *
