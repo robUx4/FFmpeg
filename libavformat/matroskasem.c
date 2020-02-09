@@ -32,7 +32,6 @@
 #include "config.h"
 
 #include <inttypes.h>
-#include <stdio.h>
 
 #include "matroskasem.h"
 
@@ -53,6 +52,18 @@ static EbmlSyntax ebml_syntax[] = {
     { EBML_ID_HEADER,      EBML_NEST, 0, 0, { .n = ebml_header } },
     { MATROSKA_ID_SEGMENT, EBML_STOP },
     { 0 }
+};
+
+static EbmlSyntax matroska_segment[] = {
+    { MATROSKA_ID_CLUSTER,     EBML_STOP },
+    { MATROSKA_ID_INFO,        EBML_LEVEL1, 0, 0, { .n = matroska_info } },
+    { MATROSKA_ID_TRACKS,      EBML_LEVEL1, 0, 0, { .n = matroska_tracks } },
+    { MATROSKA_ID_ATTACHMENTS, EBML_LEVEL1, 0, 0, { .n = matroska_attachments } },
+    { MATROSKA_ID_CHAPTERS,    EBML_LEVEL1, 0, 0, { .n = matroska_chapters } },
+    { MATROSKA_ID_CUES,        EBML_LEVEL1, 0, 0, { .n = matroska_index } },
+    { MATROSKA_ID_TAGS,        EBML_LEVEL1, 0, 0, { .n = matroska_tags } },
+    { MATROSKA_ID_SEEKHEAD,    EBML_LEVEL1, 0, 0, { .n = matroska_seekhead } },
+    { 0 }   /* We don't want to go back to level 0, so don't add the parent. */
 };
 
 static EbmlSyntax matroska_info[] = {
@@ -324,18 +335,6 @@ static EbmlSyntax matroska_seekhead_entry[] = {
 static EbmlSyntax matroska_seekhead[] = {
     { MATROSKA_ID_SEEKENTRY, EBML_NEST, sizeof(MatroskaSeekhead), offsetof(MatroskaDemuxContext, seekhead), { .n = matroska_seekhead_entry } },
     CHILD_OF(matroska_segment)
-};
-
-static EbmlSyntax matroska_segment[] = {
-    { MATROSKA_ID_CLUSTER,     EBML_STOP },
-    { MATROSKA_ID_INFO,        EBML_LEVEL1, 0, 0, { .n = matroska_info } },
-    { MATROSKA_ID_TRACKS,      EBML_LEVEL1, 0, 0, { .n = matroska_tracks } },
-    { MATROSKA_ID_ATTACHMENTS, EBML_LEVEL1, 0, 0, { .n = matroska_attachments } },
-    { MATROSKA_ID_CHAPTERS,    EBML_LEVEL1, 0, 0, { .n = matroska_chapters } },
-    { MATROSKA_ID_CUES,        EBML_LEVEL1, 0, 0, { .n = matroska_index } },
-    { MATROSKA_ID_TAGS,        EBML_LEVEL1, 0, 0, { .n = matroska_tags } },
-    { MATROSKA_ID_SEEKHEAD,    EBML_LEVEL1, 0, 0, { .n = matroska_seekhead } },
-    { 0 }   /* We don't want to go back to level 0, so don't add the parent. */
 };
 
 static EbmlSyntax matroska_segments[] = {

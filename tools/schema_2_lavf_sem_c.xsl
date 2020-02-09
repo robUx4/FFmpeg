@@ -74,9 +74,9 @@ static EbmlSyntax ebml_syntax[] = {
     <xsl:for-each select="ebml:element">
         <!-- <Parent path>/<id> -->
         <xsl:sort select="concat(
-            substring( translate(translate(@path, '))', ''), '(1*(', ''),
+            substring( translate(@path, '\+', '\'),
                     1, 
-                    string-length(translate(translate(@path, '))', ''), '(1*(', ''))-string-length(@name)
+                    string-length(translate(@path, '\+', '\'))-string-length(@name)
                     ),
             @id
         )" />
@@ -98,7 +98,7 @@ static EbmlSyntax ebml_syntax[] = {
     <xsl:template name="parsePath">
         <xsl:param name="node"/>
         <xsl:variable name="plainPath">
-            <xsl:value-of select="translate(translate($node/@path, '))', ''), '(1*(', '')" />
+            <xsl:value-of select="translate($node/@path, '\+', '\')" />
         </xsl:variable>
         <xsl:variable name="masterName">
             <xsl:choose>
@@ -118,7 +118,7 @@ static EbmlSyntax ebml_syntax[] = {
             <xsl:value-of select="translate($masterName, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
             <xsl:text>[] = {&#10;</xsl:text>
 
-            <xsl:for-each select="/ebml:EBMLSchema/ebml:element[translate(translate(@path, '))', ''), '(1*(', '') = concat(concat($plainPath, '\'), @name)]">
+            <xsl:for-each select="/ebml:EBMLSchema/ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
                 <xsl:sort select="not(@name='Info')" />
                 <xsl:sort select="not(@name='Tracks')" />
                 <xsl:sort select="not(@name='Cues')" />
@@ -231,12 +231,16 @@ static EbmlSyntax ebml_syntax[] = {
                     <xsl:text>    { 0 }   /* We don't want to go back to level 0, so don't add the parent. */&#10;</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:text>    CHILD_OF(matroska_</xsl:text><xsl:text>)&#10;</xsl:text>
+                    <xsl:text>    CHILD_OF(matroska_</xsl:text>
+                    <xsl:call-template name="parentName">
+                        <xsl:with-param name="pText" select="substring($plainPath, 0, string-length($plainPath)-string-length(@name))"/>
+                    </xsl:call-template>
+                    <xsl:text>)&#10;</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:text>};&#10;</xsl:text>
 
-            <xsl:for-each select="../ebml:element[translate(translate(@path, '))', ''), '(1*(', '') = concat(concat($plainPath, '\'), @name)]">
+            <xsl:for-each select="../ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
                 <xsl:sort select="not(@name='Info')" />
                 <xsl:sort select="not(@name='Tracks')" />
                 <xsl:sort select="not(@name='Cues')" />
@@ -253,6 +257,20 @@ static EbmlSyntax ebml_syntax[] = {
 
         </xsl:if>
 
+    </xsl:template>
+
+    <xsl:template name="parentName">
+        <xsl:param name="pText"/>
+        <xsl:choose>
+            <xsl:when test="contains($pText, '\')">
+                <xsl:call-template name="parentName">
+                    <xsl:with-param name="pText" select="substring-after($pText, '\')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="translate($pText, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="ConvertDecToHex">

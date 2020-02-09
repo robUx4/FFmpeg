@@ -48,10 +48,7 @@
     <xsl:for-each select="ebml:element">
         <!-- <Parent path>/<id> -->
         <xsl:sort select="concat(
-            substring( translate(translate(@path, '))', ''), '(1*(', ''),
-                    1, 
-                    string-length(translate(translate(@path, '))', ''), '(1*(', ''))-string-length(@name)
-                    ),
+            substring( @path, 1, string-length(@path)-string-length(@name) ),
             @id
         )" />
 
@@ -75,7 +72,7 @@
     <xsl:template name="parsePath">
         <xsl:param name="node"/>
         <xsl:variable name="plainPath">
-            <xsl:value-of select="translate(translate($node/@path, '))', ''), '(1*(', '')" />
+            <xsl:value-of select="translate($node/@path, '\+', '\')" />
         </xsl:variable>
 
         <!-- Master element comment header -->
@@ -108,7 +105,7 @@
             </xsl:choose>
         </xsl:if>
 
-        <xsl:for-each select="/ebml:EBMLSchema/ebml:element[translate(translate(@path, '))', ''), '(1*(', '') = concat(concat($plainPath, '\'), @name)]">
+        <xsl:for-each select="/ebml:EBMLSchema/ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
             <xsl:sort select="not(@name='Info')" />
             <xsl:sort select="not(@name='Tracks')" />
             <xsl:sort select="not(@name='Cues')" />
@@ -198,7 +195,7 @@
         </xsl:for-each>
         <xsl:text>&#10;</xsl:text>
 
-        <xsl:for-each select="../ebml:element[translate(translate(@path, '))', ''), '(1*(', '') = concat(concat($plainPath, '\'), @name)]">
+        <xsl:for-each select="../ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
             <xsl:sort select="not(@name='Info')" />
             <xsl:sort select="not(@name='Tracks')" />
             <xsl:sort select="not(@name='Cues')" />
@@ -414,9 +411,6 @@
         </xsl:when>
         <xsl:when test="contains($label,' /')">
             <xsl:call-template name="outputEnumLabel"><xsl:with-param name="align" select="$align"/><xsl:with-param name="label" select="substring-before($label, ' /')"/></xsl:call-template>
-        </xsl:when>
-        <xsl:when test="contains($label,'/')">
-            <xsl:call-template name="outputEnumLabel"><xsl:with-param name="align" select="$align"/><xsl:with-param name="label" select="substring-before($label, '/')"/></xsl:call-template>
         </xsl:when>
         <xsl:when test="contains($label,'__')">
             <xsl:call-template name="outputEnumLabel"><xsl:with-param name="align" select="$align"/><xsl:with-param name="label" select="concat(substring-before($label, '__'), substring-after($label, '__'))"/></xsl:call-template>
