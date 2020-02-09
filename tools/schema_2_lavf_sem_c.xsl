@@ -250,8 +250,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:otherwise>NONE</xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <!-- Structure name for master elements -->
-                <xsl:variable name="lavfMasterStructure">
+                <!-- Structure name for master elements stored in an EbmlList -->
+                <xsl:variable name="lavfListElementSize">
                     <xsl:choose>
                         <xsl:when test="@type='master'">
                             <xsl:choose>
@@ -347,23 +347,23 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:choose>
                     <xsl:when test="$lavfStorage='STOP'">
                     </xsl:when>
-                    <xsl:when test="$lavfMasterStructure='NONE' and not($lavfDefault='')">
+                    <xsl:when test="$lavfListElementSize='NONE' and not($lavfDefault='')">
                         <xsl:text>0, </xsl:text>
                     </xsl:when>
-                    <xsl:when test="$lavfMasterStructure='NONE' and $lavfStorage='NONE'">
+                    <xsl:when test="$lavfListElementSize='NONE' and $lavfStorage='NONE'">
                     </xsl:when>
-                    <xsl:when test="$lavfMasterStructure='NONE' and not($lavfStorage='')">
+                    <xsl:when test="$lavfListElementSize='NONE' and not($lavfStorage='')">
                         <xsl:text>0, </xsl:text>
                     </xsl:when>
-                    <xsl:when test="$lavfMasterStructure='NONE'">
+                    <xsl:when test="$lavfListElementSize='NONE'">
                     </xsl:when>
-                    <xsl:when test="$lavfMasterStructure">
+                    <xsl:when test="$lavfListElementSize">
                         <xsl:text>sizeof(</xsl:text>
-                        <xsl:value-of select="$lavfMasterStructure"/>
+                        <xsl:value-of select="$lavfListElementSize"/>
                         <xsl:text>), </xsl:text>
                     </xsl:when>
                 </xsl:choose>
-<!-- <xsl:value-of select="$lavfMasterStructure"/><xsl:value-of select="$lavfStorage"/> -->
+<!-- <xsl:value-of select="$lavfListElementSize"/><xsl:value-of select="$lavfStorage"/> -->
 
                 <!-- generate EbmlSyntax.data_offset -->
                 <xsl:choose>
