@@ -364,7 +364,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     </xsl:when>
                     <xsl:when test="@type='master'">
                         <xsl:choose>
-                            <xsl:when test="$masterName='Segment'">
+                            <xsl:when test="$node/@name='Segment'">
                                 <xsl:text>EBML_LEVEL1, </xsl:text>
                             </xsl:when>
                             <xsl:otherwise>
