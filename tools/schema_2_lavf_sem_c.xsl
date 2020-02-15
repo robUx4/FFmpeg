@@ -300,6 +300,12 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='SeekID'"><xsl:text>id</xsl:text></xsl:when>
                         <xsl:when test="@name='SeekPosition'"><xsl:text>pos</xsl:text></xsl:when>
                         <xsl:when test="@name='ChapterAtom'"><xsl:text>chapters</xsl:text></xsl:when>
+                        <xsl:when test="@name='BlockAdditional'"><xsl:text>additional</xsl:text></xsl:when>
+                        <xsl:when test="@name='BlockAddID'"><xsl:text>additional_id</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChapterTimeStart'"><xsl:text>start</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChapterTimeEnd'"><xsl:text>end</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChapterUID'"><xsl:text>uid</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChapString'"><xsl:text>title</xsl:text></xsl:when>
                         
                     </xsl:choose>
                 </xsl:variable>
@@ -592,6 +598,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='Cluster'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='BlockGroup'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Targets'"><xsl:text>MatroskaTagTarget</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='BlockMore'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
+                    
                 </xsl:choose>
             </xsl:when>
         </xsl:choose>
@@ -606,7 +614,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
             <xsl:when test="$node/@name='Audio'"><xsl:text>track_audio</xsl:text></xsl:when>
             <xsl:when test="$node/@name='Video'"><xsl:text>track_video</xsl:text></xsl:when>
             <xsl:when test="$node/@name='TrackOperation'"><xsl:text>track_operation</xsl:text></xsl:when>
-            <xsl:when test="$node/@name='Seek'"><xsl:text>SeekPoint</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Seek'"><xsl:text>seekhead_entry</xsl:text></xsl:when>
             <xsl:when test="$node/@name='ContentEncodings'"><xsl:text>track_encodings</xsl:text></xsl:when>
             <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>track_encoding</xsl:text></xsl:when>
             <xsl:when test="$node/@name='ContentCompression'"><xsl:text>track_encoding_compression</xsl:text></xsl:when>
@@ -619,6 +627,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
             <xsl:when test="$node/@name='CueTrackPositions'"><xsl:text>index_pos</xsl:text></xsl:when>
             <xsl:when test="$node/@name='Targets'"><xsl:text>tagtargets</xsl:text></xsl:when>
             <xsl:when test="$node/@name='AttachedFile'"><xsl:text>attachment</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='EditionEntry'"><xsl:text>chapter</xsl:text></xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="translate($node/@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz_')"/>
             </xsl:otherwise>
