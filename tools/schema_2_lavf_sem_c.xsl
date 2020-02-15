@@ -56,14 +56,14 @@ static EbmlSyntax ebml_header[] = {
     { EBML_ID_EBMLMAXIDLENGTH,    EBML_UINT, 0, offsetof(Ebml, id_length),       { .u = 4 } },
     { EBML_ID_DOCTYPE,            EBML_STR,  0, offsetof(Ebml, doctype),         { .s = "(none)" } },
     { EBML_ID_DOCTYPEREADVERSION, EBML_UINT, 0, offsetof(Ebml, doctype_version), { .u = 1 } },
-    { EBML_ID_EBMLVERSION,        EBML_NONE },
-    { EBML_ID_DOCTYPEVERSION,     EBML_NONE },
+    { EBML_ID_EBMLVERSION,        EBML_NONE,   },
+    { EBML_ID_DOCTYPEVERSION,     EBML_NONE,   },
     CHILD_OF(ebml_syntax)
 };
 
 static EbmlSyntax ebml_syntax[] = {
     { EBML_ID_HEADER,      EBML_NEST, 0, 0, { .n = ebml_header } },
-    { MATROSKA_ID_SEGMENT, EBML_STOP },
+    { MATROSKA_ID_SEGMENT, EBML_STOP,   },
     { 0 }
 };
 </xsl:text>
@@ -102,21 +102,13 @@ static EbmlSyntax matroska_cluster_enter[] = {
 
     <xsl:template name="parsePath">
         <xsl:param name="node"/>
-        <xsl:variable name="masterName">
-            <xsl:choose>
-                <xsl:when test="$node/@name='CuePoint'"><xsl:text>PointEntry</xsl:text></xsl:when>
-                <xsl:when test="$node/@name='Audio'"><xsl:text>TrackAudio</xsl:text></xsl:when>
-                <xsl:when test="$node/@name='Video'"><xsl:text>TrackVideo</xsl:text></xsl:when>
-                <xsl:when test="$node/@name='Seek'"><xsl:text>SeekPoint</xsl:text></xsl:when>
-                <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>Content Encoding</xsl:text></xsl:when>
-                <xsl:otherwise><xsl:value-of select="$node/@name"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
 
         <!-- Master element comment header -->
         <xsl:if test="@type='master'">
             <xsl:text>&#10;static EbmlSyntax matroska_</xsl:text>
-            <xsl:value-of select="translate($masterName, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+            <xsl:call-template name="masterListName">
+                <xsl:with-param name="node" select="$node"/>
+            </xsl:call-template>
             <xsl:text>[] = {&#10;</xsl:text>
 
             <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)]">
@@ -322,7 +314,10 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:variable name="lavfDefault">
                     <xsl:choose>
                         <xsl:when test="@type='master'">
-                            <xsl:text>matroska_</xsl:text><xsl:value-of select="translate(@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
+                            <xsl:text>matroska_</xsl:text>
+                            <xsl:call-template name="masterListName">
+                                <xsl:with-param name="node" select="."/>
+                            </xsl:call-template>
                         </xsl:when>
                         <xsl:when test="@name='FlagInterlaced'"><xsl:text>MATROSKA_VIDEO_INTERLACE_FLAG_UNDETERMINED</xsl:text></xsl:when>
                         <xsl:when test="@name='FieldOrder'"><xsl:text>MATROSKA_VIDEO_FIELDORDER_UNDETERMINED</xsl:text></xsl:when>
@@ -511,8 +506,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:text>    CHILD_OF(matroska_</xsl:text>
-                    <xsl:call-template name="parentName">
-                        <xsl:with-param name="pText" select="substring($node/@path, 0, string-length($node/@path)-string-length(@name))"/>
+                    <xsl:variable name="parentFullPath" select="substring(@path, 0, string-length(@path)-string-length(@name))"/>
+                    <xsl:call-template name="masterListName">
+                        <xsl:with-param name="node" select="../ebml:element[@path = $parentFullPath]"/>
                     </xsl:call-template>
                     <xsl:text>)&#10;</xsl:text>
                 </xsl:otherwise>
@@ -598,6 +594,34 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='Targets'"><xsl:text>MatroskaTagTarget</xsl:text></xsl:when>
                 </xsl:choose>
             </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="masterListName">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/@name='TrackEntry'"><xsl:text>track</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Cues'"><xsl:text>index</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CuePoint'"><xsl:text>index_entry</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Audio'"><xsl:text>track_audio</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Video'"><xsl:text>track_video</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackOperation'"><xsl:text>track_operation</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Seek'"><xsl:text>SeekPoint</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncodings'"><xsl:text>track_encodings</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>track_encoding</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentCompression'"><xsl:text>track_encoding_compression</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncryption'"><xsl:text>track_encoding_encryption</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackCombinePlanes'"><xsl:text>track_combine_planes</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackPlane'"><xsl:text>track_plane</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Colour'"><xsl:text>track_video_color</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Projection'"><xsl:text>track_video_projection</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='MasteringMetadata'"><xsl:text>mastering_meta</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CueTrackPositions'"><xsl:text>index_pos</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Targets'"><xsl:text>tagtargets</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='AttachedFile'"><xsl:text>attachment</xsl:text></xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="translate($node/@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz_')"/>
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
