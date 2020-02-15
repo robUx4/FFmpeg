@@ -207,8 +207,8 @@ static EbmlSyntax matroska_mastering_meta[] = {
     { MATROSKA_ID_VIDEOCOLOR_BY, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, b_y), { .f=-1 } },
     { MATROSKA_ID_VIDEOCOLOR_WHITEX, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, white_x), { .f=-1 } },
     { MATROSKA_ID_VIDEOCOLOR_WHITEY, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, white_y), { .f=-1 } },
-    { MATROSKA_ID_VIDEOCOLOR_LUMINANCEMIN, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, min_luminance), { .f=-1 } },
     { MATROSKA_ID_VIDEOCOLOR_LUMINANCEMAX, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, max_luminance), { .f=-1 } },
+    { MATROSKA_ID_VIDEOCOLOR_LUMINANCEMIN, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, min_luminance), { .f=-1 } },
     CHILD_OF(matroska_track_video_color)
 };
 
