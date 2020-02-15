@@ -328,9 +328,17 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='FlagInterlaced'"><xsl:text>MATROSKA_VIDEO_INTERLACE_FLAG_UNDETERMINED</xsl:text></xsl:when>
                         <xsl:when test="@name='FieldOrder'"><xsl:text>MATROSKA_VIDEO_FIELDORDER_UNDETERMINED</xsl:text></xsl:when>
                         <xsl:when test="@name='StereoMode'"><xsl:text>MATROSKA_VIDEO_STEREOMODE_TYPE_NB</xsl:text></xsl:when>
+                        <xsl:when test="@name='ProjectionType'"><xsl:text>MATROSKA_VIDEO_PROJECTION_TYPE_RECTANGULAR</xsl:text></xsl:when>
+                        <xsl:when test="@name='MatrixCoefficients'"><xsl:text>AVCOL_SPC_UNSPECIFIED</xsl:text></xsl:when>
+                        <xsl:when test="@name='Primaries'"><xsl:text>AVCOL_PRI_UNSPECIFIED</xsl:text></xsl:when>
+                        <xsl:when test="@name='TransferCharacteristics'"><xsl:text>AVCOL_TRC_UNSPECIFIED</xsl:text></xsl:when>
+                        <xsl:when test="@name='Range'"><xsl:text>AVCOL_RANGE_UNSPECIFIED</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChromaSitingHorz'"><xsl:text>MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChromaSitingVert'"><xsl:text>MATROSKA_COLOUR_CHROMASITINGVERT_UNDETERMINED</xsl:text></xsl:when>
                         <xsl:when test="@name='DisplayWidth'"><xsl:text>-1</xsl:text></xsl:when>
                         <xsl:when test="@name='DisplayHeight'"><xsl:text>-1</xsl:text></xsl:when>
                         <xsl:when test="@name='DisplayUnit'"><xsl:text>MATROSKA_VIDEO_DISPLAYUNIT_PIXELS</xsl:text></xsl:when>
+                        <xsl:when test="@name='ReferenceBlock'"><xsl:text>INT64_MIN</xsl:text></xsl:when>
                         <xsl:when test="@default='0x1p+0'"><xsl:text>1.0</xsl:text></xsl:when>
                         <xsl:when test="@default='0x0p+0'"><xsl:text>0.0</xsl:text></xsl:when>
                         <xsl:when test="@default='0x1.f4p+12'"><xsl:text>8000.0</xsl:text></xsl:when>
@@ -341,6 +349,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                             <xsl:if test="not($lavfStorage='')">
                                 <xsl:value-of select="@default"/>
                             </xsl:if>
+                            <!-- <xsl:if test="@type='float'">
+                                <xsl:text>-1</xsl:text>
+                            </xsl:if> -->
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
@@ -362,6 +373,10 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:choose>
                     <xsl:when test="@name='Cluster'">
                         <xsl:text>EBML_STOP,   </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="@name='SeekID'">
+                        <!-- can be stored in an integer -->
+                        <xsl:text>EBML_UINT,   </xsl:text>
                     </xsl:when>
                     <xsl:when test="@type='master'">
                         <xsl:choose>
@@ -468,6 +483,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$lavfStorage='STOP'">
                     </xsl:when>
                     <xsl:when test="$lavfDefault=''">
+                    </xsl:when>
+                    <xsl:when test="@type='uinteger' and $lavfDefault='0'">
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:text>, { </xsl:text>
@@ -595,7 +612,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='Audio'"><xsl:text>MatroskaTrackAudio</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='MasteringMetadata'"><xsl:text>MatroskaMasteringMeta</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Projection'"><xsl:text>MatroskaTrackVideoProjection</xsl:text></xsl:when>
-                    <xsl:when test="$node/@name='Cluster'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Cluster'"><xsl:text>MatroskaCluster</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='BlockGroup'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Targets'"><xsl:text>MatroskaTagTarget</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='BlockMore'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
@@ -628,6 +645,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
             <xsl:when test="$node/@name='Targets'"><xsl:text>tagtargets</xsl:text></xsl:when>
             <xsl:when test="$node/@name='AttachedFile'"><xsl:text>attachment</xsl:text></xsl:when>
             <xsl:when test="$node/@name='EditionEntry'"><xsl:text>chapter</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Cluster'"><xsl:text>cluster_parsing</xsl:text></xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="translate($node/@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz_')"/>
             </xsl:otherwise>
