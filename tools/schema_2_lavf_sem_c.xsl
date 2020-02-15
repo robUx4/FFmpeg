@@ -285,7 +285,6 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='CueTime'"><xsl:text>time</xsl:text></xsl:when>
                         <xsl:when test="@name='CueClusterPosition'"><xsl:text>pos</xsl:text></xsl:when>
                         <xsl:when test="@name='CueTrack'"><xsl:text>track</xsl:text></xsl:when>
-                        <xsl:when test="@name='Tags'"><xsl:text>tags</xsl:text></xsl:when>
                         <xsl:when test="@name='Targets'"><xsl:text>target</xsl:text></xsl:when>
                         <xsl:when test="@name='SimpleTag'"><xsl:text>tag</xsl:text></xsl:when>
                         <xsl:when test="@name='AttachedFile'"><xsl:text>attachments</xsl:text></xsl:when>
@@ -299,6 +298,16 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='Block'"><xsl:text>bin</xsl:text></xsl:when>
                         <xsl:when test="@name='ReferenceBlock'"><xsl:text>reference</xsl:text></xsl:when>
                         <xsl:when test="@name='DiscardPadding'"><xsl:text>discard_padding</xsl:text></xsl:when>
+                        <xsl:when test="@name='Tag'"><xsl:text>tags</xsl:text></xsl:when>
+                        <xsl:when test="@name='TagChapterUID'"><xsl:text>chapteruid</xsl:text></xsl:when>
+                        <xsl:when test="@name='TagTrackUID'"><xsl:text>trackuid</xsl:text></xsl:when>
+                        <xsl:when test="@name='TagAttachmentUID'"><xsl:text>attachuid</xsl:text></xsl:when>
+                        <xsl:when test="@name='TargetType'"><xsl:text>type</xsl:text></xsl:when>
+                        <xsl:when test="@name='TargetTypeValue'"><xsl:text>typevalue</xsl:text></xsl:when>
+                        <xsl:when test="@name='Seek'"><xsl:text>seekhead</xsl:text></xsl:when>
+                        <xsl:when test="@name='SeekID'"><xsl:text>id</xsl:text></xsl:when>
+                        <xsl:when test="@name='SeekPosition'"><xsl:text>pos</xsl:text></xsl:when>
+                        <xsl:when test="@name='ChapterAtom'"><xsl:text>chapters</xsl:text></xsl:when>
                         
                     </xsl:choose>
                 </xsl:variable>
@@ -555,8 +564,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='Colour'"><xsl:text>MatroskaTrackVideoColor</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='CuePoint'"><xsl:text>MatroskaIndex</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='CueTrackPositions'"><xsl:text>MatroskaIndexPos</xsl:text></xsl:when>
-                    <xsl:when test="$node/@name='Tags'"><xsl:text>MatroskaTags</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='AttachedFile'"><xsl:text>MatroskaAttachment</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Seek'"><xsl:text>MatroskaSeekhead</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='Tag'"><xsl:text>MatroskaTags</xsl:text></xsl:when>
                     
                 </xsl:choose>
             </xsl:when>
@@ -574,6 +584,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='Cues'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Tags'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Attachments'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='SeekHead'"><xsl:text>MatroskaDemuxContext</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='TrackCombinePlanes'"><xsl:text>MatroskaTrackOperation</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='ContentEncryption'"><xsl:text>MatroskaTrackEncryption</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='ContentCompression'"><xsl:text>MatroskaTrackCompression</xsl:text></xsl:when>
@@ -584,7 +595,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='Projection'"><xsl:text>MatroskaTrackVideoProjection</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Cluster'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='BlockGroup'"><xsl:text>MatroskaBlock</xsl:text></xsl:when>
-                    
+                    <xsl:when test="$node/@name='Targets'"><xsl:text>MatroskaTagTarget</xsl:text></xsl:when>
                 </xsl:choose>
             </xsl:when>
         </xsl:choose>
