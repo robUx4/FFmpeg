@@ -571,7 +571,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
         <!-- generate EbmlSyntax.id -->
         <xsl:text>    { MATROSKA_ID_</xsl:text>
         <xsl:choose>
-            <xsl:when test="string-length($lavfNameUpper) &lt; 18">
+            <xsl:when test="string-length($lavfNameUpper) &lt; 24">
                 <xsl:value-of select="substring(concat($lavfNameUpper, ',                                   '),0,26)"/>
             </xsl:when>
             <xsl:otherwise>
