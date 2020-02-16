@@ -509,6 +509,17 @@ static EbmlSyntax matroska_cluster_enter[] = {
             </xsl:call-template>
         </xsl:variable>
 
+        <xsl:variable name="parentFullPath">
+            <xsl:call-template name="getParentPath">
+                <xsl:with-param name="node" select="."/>
+            </xsl:call-template>
+        </xsl:variable>
+    
+        <!-- <xsl:variable name="parentNode" select="../ebml:element[@path = $parentFullPath]"/> -->
+<!-- <xsl:value-of select="$parentFullPath"/><xsl:text>&#10;</xsl:text> -->
+<!-- <xsl:value-of select="$parentNode/@name"/> -->
+
+
         <!-- Default value to use -->
         <!-- Master elements use their own sub-EbmlSyntax structure -->
         <xsl:variable name="lavfDefault">
@@ -524,6 +535,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:when>
+                <xsl:when test="$parentFullPath='\Segment\Tracks\TrackEntry\Video\Colour\MasteringMetadata' and $node/@type='float'"><xsl:text>-1</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='FlagInterlaced'"><xsl:text>MATROSKA_VIDEO_INTERLACE_FLAG_UNDETERMINED</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='FieldOrder'"><xsl:text>MATROSKA_VIDEO_FIELDORDER_UNDETERMINED</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='StereoMode'"><xsl:text>MATROSKA_VIDEO_STEREOMODE_TYPE_NB</xsl:text></xsl:when>
@@ -556,17 +568,6 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-
-        <xsl:variable name="parentFullPath">
-            <xsl:call-template name="getParentPath">
-                <xsl:with-param name="node" select="."/>
-            </xsl:call-template>
-        </xsl:variable>
-    
-        <!-- <xsl:variable name="parentNode" select="../ebml:element[@path = $parentFullPath]"/> -->
-<!-- <xsl:value-of select="$parentFullPath"/><xsl:text>&#10;</xsl:text> -->
-<!-- <xsl:value-of select="$parentNode/@name"/> -->
-
 
         <!-- generate EbmlSyntax.id -->
         <xsl:text>    { MATROSKA_ID_</xsl:text>
