@@ -203,6 +203,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
     <!-- Type of elements stored in an EbmlList -->
     <xsl:template name="ebmlListStructure">
         <xsl:param name="node"/>
+        <xsl:param name="recursive"/>
+        
         <xsl:choose>
             <xsl:when test="$node/@type='master'">
                 <xsl:choose>
@@ -216,7 +218,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='Seek'"><xsl:text>MatroskaSeekhead</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Tag'"><xsl:text>MatroskaTags</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='SimpleTag'"><xsl:text>MatroskaTag</xsl:text></xsl:when>
-                    <xsl:when test="$node/@name='ChapterAtom'"><xsl:text>MatroskaChapter</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='ChapterAtom' and not($recursive='1')"><xsl:text>MatroskaChapter</xsl:text></xsl:when>
                     
                 </xsl:choose>
             </xsl:when>
@@ -453,7 +455,12 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:when test="$node/@name='CueClusterPosition'"><xsl:text>pos</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='CueTrack'"><xsl:text>track</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='Targets'"><xsl:text>target</xsl:text></xsl:when>
-                <xsl:when test="$node/@name='SimpleTag'"><xsl:text>tag</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='SimpleTag'">
+                    <xsl:choose>
+                        <xsl:when test="$recursive='1'"><xsl:text>sub</xsl:text></xsl:when>
+                        <xsl:otherwise><xsl:text>tag</xsl:text></xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
                 <xsl:when test="$node/@name='AttachedFile'"><xsl:text>attachments</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='FileData'"><xsl:text>bin</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='FileMimeType'"><xsl:text>mime</xsl:text></xsl:when>
@@ -474,7 +481,12 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:when test="$node/@name='Seek'"><xsl:text>seekhead</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='SeekID'"><xsl:text>id</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='SeekPosition'"><xsl:text>pos</xsl:text></xsl:when>
-                <xsl:when test="$node/@name='ChapterAtom'"><xsl:text>chapters</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ChapterAtom'">
+                    <xsl:choose>
+                        <xsl:when test="$recursive='1'"></xsl:when>
+                        <xsl:otherwise><xsl:text>chapters</xsl:text></xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
                 <xsl:when test="$node/@name='BlockAdditional'"><xsl:text>additional</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='BlockAddID'"><xsl:text>additional_id</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='ChapterTimeStart'"><xsl:text>start</xsl:text></xsl:when>
@@ -493,6 +505,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
         <xsl:variable name="lavfListElementSize">
             <xsl:call-template name="ebmlListStructure">
                 <xsl:with-param name="node" select="$node"/>
+                <xsl:with-param name="recursive" select="$recursive"/>
             </xsl:call-template>
         </xsl:variable>
 
@@ -501,10 +514,15 @@ static EbmlSyntax matroska_cluster_enter[] = {
         <xsl:variable name="lavfDefault">
             <xsl:choose>
                 <xsl:when test="$node/@type='master'">
-                    <xsl:text>matroska_</xsl:text>
-                    <xsl:call-template name="masterListName">
-                        <xsl:with-param name="node" select="$node"/>
-                    </xsl:call-template>
+                    <xsl:choose>
+                        <xsl:when test="$recursive='1' and $node/@name='ChapterAtom'"></xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>matroska_</xsl:text>
+                            <xsl:call-template name="masterListName">
+                                <xsl:with-param name="node" select="$node"/>
+                            </xsl:call-template>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:when>
                 <xsl:when test="$node/@name='FlagInterlaced'"><xsl:text>MATROSKA_VIDEO_INTERLACE_FLAG_UNDETERMINED</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='FieldOrder'"><xsl:text>MATROSKA_VIDEO_FIELDORDER_UNDETERMINED</xsl:text></xsl:when>
@@ -576,6 +594,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$parentFullPath='\Segment'">
                         <xsl:text>EBML_LEVEL1, </xsl:text>
                     </xsl:when>
+                    <xsl:when test="$recursive='1' and $node/@name='ChapterAtom'">
+                        <xsl:text>EBML_NONE,   </xsl:text>
+                    </xsl:when>
                     <xsl:otherwise>
                         <xsl:text>EBML_NEST,   </xsl:text>
                     </xsl:otherwise>
@@ -646,6 +667,11 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 
                 <xsl:variable name="parentStructure">
                     <xsl:choose>
+                        <xsl:when test="$recursive=1">
+                            <xsl:call-template name="ebmlListStructure">
+                                <xsl:with-param name="node" select="$node"/>
+                            </xsl:call-template>
+                        </xsl:when>
                         <xsl:when test="not($parentStructureFromList='')">
                             <xsl:value-of select="$parentStructureFromList"/>
                         </xsl:when>
