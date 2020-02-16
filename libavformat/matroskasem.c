@@ -359,8 +359,8 @@ static EbmlSyntax matroska_chapter_entry[] = {
     { MATROSKA_ID_CHAPTERTIMEEND,     EBML_UINT, 0, offsetof(MatroskaChapter, end),   { .u = AV_NOPTS_VALUE } },
     { MATROSKA_ID_CHAPTERFLAGHIDDEN,  EBML_NONE,    },
     { MATROSKA_ID_CHAPTERFLAGENABLED, EBML_NONE,    },
-    { MATROSKA_ID_CHAPTERUID,         EBML_UINT, 0, offsetof(MatroskaChapter, uid) },
     { MATROSKA_ID_CHAPTERPHYSEQUIV,   EBML_NONE,    },
+    { MATROSKA_ID_CHAPTERUID,         EBML_UINT, 0, offsetof(MatroskaChapter, uid) },
     { MATROSKA_ID_CHAPTERATOM,        EBML_NONE,    },
     CHILD_OF(matroska_chapter)
 };
