@@ -191,7 +191,7 @@
             <xsl:text>  </xsl:text>
             <xsl:value-of select="@id"/>
             <xsl:text>&#10;</xsl:text>
-            <xsl:if test="@name='TagDefault'"><xsl:text>#define MATROSKA_ID_TAGDEFAULT_BUG            0x44B4&#10;</xsl:text></xsl:if>
+            <xsl:if test="@name='TagDefault'"><xsl:text>#define MATROSKA_ID_TAGDEFAULT_BUG            0x44B4 // old bogus tag value&#10;</xsl:text></xsl:if>
         </xsl:for-each>
         <xsl:text>&#10;</xsl:text>
 
