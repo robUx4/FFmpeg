@@ -56,14 +56,14 @@ static EbmlSyntax ebml_header[] = {
     { EBML_ID_EBMLMAXIDLENGTH,    EBML_UINT, 0, offsetof(Ebml, id_length),       { .u = 4 } },
     { EBML_ID_DOCTYPE,            EBML_STR,  0, offsetof(Ebml, doctype),         { .s = "(none)" } },
     { EBML_ID_DOCTYPEREADVERSION, EBML_UINT, 0, offsetof(Ebml, doctype_version), { .u = 1 } },
-    { EBML_ID_EBMLVERSION,        EBML_NONE,   },
-    { EBML_ID_DOCTYPEVERSION,     EBML_NONE,   },
+    { EBML_ID_EBMLVERSION,        EBML_NONE },
+    { EBML_ID_DOCTYPEVERSION,     EBML_NONE },
     CHILD_OF(ebml_syntax)
 };
 
 static EbmlSyntax ebml_syntax[] = {
     { EBML_ID_HEADER,      EBML_NEST, 0, 0, { .n = ebml_header } },
-    { MATROSKA_ID_SEGMENT, EBML_STOP,   },
+    { MATROSKA_ID_SEGMENT, EBML_STOP },
     { 0 }
 };
 </xsl:text>
@@ -581,51 +581,64 @@ static EbmlSyntax matroska_cluster_enter[] = {
         <xsl:text> </xsl:text>
 
         <!-- generate EbmlSyntax.type -->
+        <xsl:variable name="ebmlType">
+            <xsl:choose>
+                <xsl:when test="$node/@name='Cluster'">
+                    <xsl:text>EBML_STOP</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@name='SeekID'">
+                    <!-- can be stored in an integer -->
+                    <xsl:text>EBML_UINT</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='master'">
+                    <xsl:choose>
+                        <xsl:when test="$parentFullPath='\Segment'">
+                            <xsl:text>EBML_LEVEL1</xsl:text>
+                        </xsl:when>
+                        <xsl:when test="$recursive='1' and $node/@name='ChapterAtom'">
+                            <xsl:text>EBML_NONE</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>EBML_NEST</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <xsl:when test="$lavfStorage=''">
+                    <xsl:text>EBML_NONE</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='uinteger'">
+                    <xsl:text>EBML_UINT</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='integer'">
+                    <xsl:text>EBML_SINT</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='utf-8'">
+                    <xsl:text>EBML_UTF8</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='string'">
+                    <xsl:text>EBML_STR</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='binary'">
+                    <xsl:text>EBML_BIN</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='date'">
+                    <xsl:text>EBML_BIN</xsl:text>
+                </xsl:when>
+                <xsl:when test="$node/@type='float'">
+                    <xsl:text>EBML_FLOAT</xsl:text>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
         <xsl:choose>
-            <xsl:when test="$node/@name='Cluster'">
-                <xsl:text>EBML_STOP,   </xsl:text>
+            <xsl:when test="$ebmlType='EBML_NONE'">
+                <xsl:value-of select="$ebmlType"/>
             </xsl:when>
-            <xsl:when test="$node/@name='SeekID'">
-                <!-- can be stored in an integer -->
-                <xsl:text>EBML_UINT,   </xsl:text>
+            <xsl:when test="$ebmlType='EBML_STOP'">
+                <xsl:value-of select="$ebmlType"/>
             </xsl:when>
-            <xsl:when test="$node/@type='master'">
-                <xsl:choose>
-                    <xsl:when test="$parentFullPath='\Segment'">
-                        <xsl:text>EBML_LEVEL1, </xsl:text>
-                    </xsl:when>
-                    <xsl:when test="$recursive='1' and $node/@name='ChapterAtom'">
-                        <xsl:text>EBML_NONE,   </xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text>EBML_NEST,   </xsl:text>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:when>
-            <xsl:when test="$lavfStorage=''">
-                <xsl:text>EBML_NONE,   </xsl:text>
-            </xsl:when>
-            <xsl:when test="$node/@type='uinteger'">
-                <xsl:text>EBML_UINT,   </xsl:text>
-            </xsl:when>
-            <xsl:when test="$node/@type='integer'">
-                <xsl:text>EBML_SINT,   </xsl:text>
-            </xsl:when>
-            <xsl:when test="$node/@type='utf-8'">
-                <xsl:text>EBML_UTF8,   </xsl:text>
-            </xsl:when>
-            <xsl:when test="$node/@type='string'">
-                <xsl:text>EBML_STR,    </xsl:text>
-            </xsl:when>
-            <xsl:when test="$node/@type='binary'">
-                <xsl:text>EBML_BIN,    </xsl:text>
-            </xsl:when>
-            <xsl:when test="$node/@type='date'">
-                <xsl:text>EBML_BIN,    </xsl:text>
-            </xsl:when>
-            <xsl:when test="$node/@type='float'">
-                <xsl:text>EBML_FLOAT,  </xsl:text>
-            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="substring(concat($ebmlType, ',                                   '),0,14)"/>
+            </xsl:otherwise>
         </xsl:choose>
 
         <!-- generate EbmlSyntax.list_elem_size -->
