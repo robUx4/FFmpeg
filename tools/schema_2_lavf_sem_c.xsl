@@ -110,8 +110,12 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:with-param name="node" select="$node"/>
             </xsl:call-template>
             <xsl:text>[] = {&#10;</xsl:text>
+<!-- <xsl:value-of select="@path"/><xsl:text>&#10;</xsl:text>
+<xsl:value-of select="concat(concat($node/@path, '\'), @name)"/><xsl:text>&#10;</xsl:text> -->
 
-            <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)]">
+
+            <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
+                                  /ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
                 <xsl:sort select="not(@name='Info')" />
                 <xsl:sort select="not(@name='Tracks')" />
                 <xsl:sort select="not(@name='Cues')" />
@@ -120,8 +124,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:sort select="@name='Audio'" />
                 <xsl:sort select="string-length(@id)" />
                 <xsl:sort select="@id" />
+
+                <!-- Transform the ebml_matroska.xml name into the libavformat name -->
                 <xsl:variable name="lavfName">
-                    <!-- Transform the ebml_matroska.xml name into the libavformat name -->
                     <xsl:choose>
                         <xsl:when test="@name='FileDescription'"><xsl:text>FileDesc</xsl:text></xsl:when>
                         <xsl:when test="@name='ChapLanguage'"><xsl:text>ChapLang</xsl:text></xsl:when>
@@ -185,7 +190,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:variable name="lavfNameUpper">
                     <xsl:value-of select="translate($lavfName, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
                 </xsl:variable>
+
                 <!-- Storage name in a structure if any -->
+                <!-- Master elements are assumed to be always stored -->
                 <xsl:variable name="lavfStorage">
                     <xsl:choose>
                         <xsl:when test="@name='DateUTC'"><xsl:text>date_utc</xsl:text></xsl:when>
@@ -306,6 +313,10 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:when test="@name='ChapterTimeEnd'"><xsl:text>end</xsl:text></xsl:when>
                         <xsl:when test="@name='ChapterUID'"><xsl:text>uid</xsl:text></xsl:when>
                         <xsl:when test="@name='ChapString'"><xsl:text>title</xsl:text></xsl:when>
+                        <xsl:when test="@name='TagLanguage'"><xsl:text>lang</xsl:text></xsl:when>
+                        <xsl:when test="@name='TagDefault'"><xsl:text>def</xsl:text></xsl:when>
+                        <xsl:when test="@name='TagString'"><xsl:text>string</xsl:text></xsl:when>
+                        <xsl:when test="@name='TagName'"><xsl:text>name</xsl:text></xsl:when>
                         
                     </xsl:choose>
                 </xsl:variable>
@@ -316,7 +327,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:with-param name="node" select="."/>
                     </xsl:call-template>
                 </xsl:variable>
+
                 <!-- Default value to use -->
+                <!-- Master elements use their own sub-EbmlSyntax structure -->
                 <xsl:variable name="lavfDefault">
                     <xsl:choose>
                         <xsl:when test="@type='master'">
@@ -523,6 +536,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
 
                 <xsl:text> },&#10;</xsl:text>
             </xsl:for-each>
+            
             <xsl:choose>
                 <xsl:when test="@name='Segment'">
                     <xsl:text>    { 0 }   /* We don't want to go back to level 0, so don't add the parent. */&#10;</xsl:text>
@@ -538,7 +552,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
             </xsl:choose>
             <xsl:text>};&#10;</xsl:text>
 
-            <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)]">
+            <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)] | 
+                                  ../ebml:element[@path = concat(concat($node/@path, '\+'), @name)]">
                 <xsl:sort select="not(@name='Info')" />
                 <xsl:sort select="not(@name='Tracks')" />
                 <xsl:sort select="not(@name='Cues')" />
@@ -586,6 +601,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$node/@name='AttachedFile'"><xsl:text>MatroskaAttachment</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Seek'"><xsl:text>MatroskaSeekhead</xsl:text></xsl:when>
                     <xsl:when test="$node/@name='Tag'"><xsl:text>MatroskaTags</xsl:text></xsl:when>
+                    <xsl:when test="$node/@name='SimpleTag'"><xsl:text>MatroskaTag</xsl:text></xsl:when>
                     
                 </xsl:choose>
             </xsl:when>
@@ -646,6 +662,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
             <xsl:when test="$node/@name='AttachedFile'"><xsl:text>attachment</xsl:text></xsl:when>
             <xsl:when test="$node/@name='EditionEntry'"><xsl:text>chapter</xsl:text></xsl:when>
             <xsl:when test="$node/@name='Cluster'"><xsl:text>cluster_parsing</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterAtom'"><xsl:text>chapter_entry</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterDisplay'"><xsl:text>chapter_display</xsl:text></xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="translate($node/@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz_')"/>
             </xsl:otherwise>
