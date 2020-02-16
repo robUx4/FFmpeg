@@ -458,7 +458,11 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:when test="$lavfStorage=''">
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:variable name="parentFullPath" select="substring(@path, 0, string-length(@path)-string-length(@name))"/>
+                        <xsl:variable name="parentFullPath">
+                            <xsl:call-template name="getParentPath">
+                                <xsl:with-param name="node" select="."/>
+                            </xsl:call-template>
+                        </xsl:variable>
                     
                         <!-- <xsl:variable name="parentNode" select="../ebml:element[@path = $parentFullPath]"/> -->
 <!-- <xsl:value-of select="$parentFullPath"/> -->
@@ -469,6 +473,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                                 <xsl:with-param name="node" select="../ebml:element[@path = $parentFullPath]"/>
                             </xsl:call-template>
                         </xsl:variable>
+                        
                         <xsl:variable name="parentStructure">
                             <xsl:choose>
                                 <xsl:when test="not($parentStructureFromList='')">
@@ -543,7 +548,11 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:text>    CHILD_OF(matroska_</xsl:text>
-                    <xsl:variable name="parentFullPath" select="substring(@path, 0, string-length(@path)-string-length(@name))"/>
+                    <xsl:variable name="parentFullPath">
+                        <xsl:call-template name="getParentPath">
+                            <xsl:with-param name="node" select="."/>
+                        </xsl:call-template>
+                    </xsl:variable>
                     <xsl:call-template name="masterListName">
                         <xsl:with-param name="node" select="../ebml:element[@path = $parentFullPath]"/>
                     </xsl:call-template>
@@ -668,6 +677,11 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:value-of select="translate($node/@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz_')"/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="getParentPath">
+        <xsl:param name="node"/>
+        <xsl:value-of select="substring($node/@path, 0, string-length($node/@path)-string-length($node/@name))"/>
     </xsl:template>
 
 </xsl:stylesheet>
