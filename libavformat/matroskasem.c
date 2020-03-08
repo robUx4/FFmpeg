@@ -360,7 +360,6 @@ EbmlSyntax matroska_attachments[] = {
     CHILD_OF(matroska_segment)
 };
 
-
 EbmlSyntax matroska_segment[] = {
     { MATROSKA_ID_CLUSTER,     EBML_STOP },
     { MATROSKA_ID_INFO,        EBML_LEVEL1, 0, 0, { .n = matroska_info } },
