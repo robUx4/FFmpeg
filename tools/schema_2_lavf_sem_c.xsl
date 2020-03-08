@@ -135,7 +135,6 @@ EbmlSyntax matroska_cluster_enter[] = {
             <xsl:when test="$node/@name='Tags'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='Tracks'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='Segment'"><xsl:text>y</xsl:text></xsl:when>
-            <xsl:when test="$node/@name='Seek'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='SeekHead'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='CuePoint'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='Cues'"><xsl:text>y</xsl:text></xsl:when>
@@ -147,6 +146,12 @@ EbmlSyntax matroska_cluster_enter[] = {
             <xsl:when test="$node/@name='Chapters'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='Attachments'"><xsl:text>y</xsl:text></xsl:when>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="ebml:EBMLSchema/ebml:element">
+        <xsl:call-template name="outputChildEbmlSyntax">
+            <xsl:with-param name="node" select="."/>
+        </xsl:call-template>
     </xsl:template>
 
     <xsl:template name="parsePath">
@@ -180,20 +185,40 @@ EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:with-param name="node" select="$node"/>
             </xsl:call-template>
             <xsl:text>[] = {&#10;</xsl:text>
-<!-- <xsl:value-of select="@path"/><xsl:text>&#10;</xsl:text>
-<xsl:value-of select="concat(concat($node/@path, '\'), @name)"/><xsl:text>&#10;</xsl:text> -->
+
+            <xsl:variable name="childSort">
+                <xsl:choose>
+                    <xsl:when test="@name='MasteringMetadata'"><xsl:text>@name='LuminanceMax'</xsl:text></xsl:when>
+                </xsl:choose>
+            </xsl:variable>
+<!-- <xsl:value-of select="@path"/><xsl:text>&#10;</xsl:text> -->
+<!-- <xsl:value-of select="concat(substring( @path, 1, string-length(@path)-string-length(@name) ), @name)"/><xsl:text>&#10;</xsl:text> -->
+<!-- <xsl:value-of select="$childSort"/><xsl:text>&#10;</xsl:text> -->
+<!-- <xsl:value-of select="concat(concat($node/@path, '\'), @name)"/><xsl:text>&#10;</xsl:text> -->
+
+            <!-- <xsl:apply-templates select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
+                                  /ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
+                <xsl:sort select="concat(substring( @path, 1, string-length(@path)-string-length(@name) ), @name)" order="ascending"/>
+            </xsl:apply-templates> -->
 
 
             <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
                                   /ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
-                <!-- <xsl:if test="substring( @path, 1, string-length(@path)-string-length(@name)-1 )='\Segment\Tracks\TrackEntry\Video\Colour\MasteringMetadata'"> -->
-                    <xsl:sort select="@name='LuminanceMax'"/>
+                    <!-- Common elements that should be found early when parsing -->
                     <xsl:sort select="not(@name='Cluster')"/>
-                <!-- </xsl:if> -->
-                <xsl:sort select="string-length(@id)" />
+                    <xsl:sort select="not(@name='TrackNumber')"/>
+                    <xsl:sort select="not(@name='SimpleBlock')"/>
+                    <xsl:sort select="not(@name='BlockGroup')"/>
+                    <xsl:sort select="not(@name='Block')"/>
+                    <xsl:sort select="not(@name='Video')"/>
+                    <xsl:sort select="not(@name='Audio')"/>
+                    <xsl:sort select="not(@name='Info')"/>
+                    <xsl:sort select="not(@name='TimestampScale')"/>
+                    <xsl:sort select="not(@name='CueTrack')"/>
+                    <xsl:sort select="not(@name='CueClusterPosition')"/>
+                    <xsl:sort select="@type='master'"/>
                 <xsl:sort select="@id" />
 
-<!-- <xsl:value-of select="substring( @path, 1, string-length(@path)-string-length(@name)-1 )"/><xsl:text>&#10;</xsl:text> -->
                 <xsl:call-template name="outputChildEbmlSyntax">
                     <xsl:with-param name="node" select="."/>
                 </xsl:call-template>
