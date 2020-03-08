@@ -348,7 +348,7 @@ static EbmlSyntax matroska_blockmore[] = {
     CHILD_OF(matroska_blockadditions)
 };
 
-static EbmlSyntax matroska_blockadditions[] = {
+EbmlSyntax matroska_blockadditions[] = {
     { MATROSKA_ID_BLOCKMORE, EBML_NEST, 0, 0, {.n = matroska_blockmore} },
     CHILD_OF(matroska_blockgroup)
 };
