@@ -13,7 +13,8 @@
   <xsl:template match="ebml:EBMLSchema">
 <xsl:text>/*
  * Matroska file semantic definition
- * Copyright (c) 2003-2019 The FFmpeg Project
+ *  DO NOT EDIT, GENERATED WITH schema_2_lavf_sem_c.xsl
+ * Copyright (c) 2003-2020 The FFmpeg Project
  *
  * This file is part of FFmpeg.
  *

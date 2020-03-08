@@ -15,7 +15,7 @@
  * Matroska Semantic constants
  *  DO NOT EDIT, GENERATED WITH schema_2_lavf_h.xsl
  *
- * Copyright (c) 2003-2004 The FFmpeg project
+ * Copyright (c) 2003-2020 The FFmpeg project
  *
  * This file is part of FFmpeg.
  *
