@@ -495,6 +495,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:when test="$node/@name='ChapString'"><xsl:text>title</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='TagLanguage'"><xsl:text>lang</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='TagDefault'"><xsl:text>def</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TagDefault_Bug'"><xsl:text>def</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='TagString'"><xsl:text>string</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='TagName'"><xsl:text>name</xsl:text></xsl:when>
                 

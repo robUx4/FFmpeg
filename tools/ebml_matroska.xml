@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <EBMLSchema xmlns="https://ietf.org/cellar/ebml" docType="matroska" version="4">
+
+  <!-- Extra Custom element to add due to an old parser bug -->
+  <element name="TagDefault_Bug" path="\Segment\Tags\Tag\+SimpleTag\TagDefault_Bug" id="0x44B4" type="uinteger" range="0-1" default="1" minOccurs="1" maxOccurs="1"/>
+
   <!-- constraints on EBML Header Elements -->
   <element name="EBMLMaxIDLength" path="\EBML\EBMLMaxIDLength" id="0x42F2" type="uinteger" range="4" default="4" minOccurs="1" maxOccurs="1"/>
   <element name="EBMLMaxSizeLength" path="\EBML\EBMLMaxSizeLength" id="0x42F3" type="uinteger" range="1-8" default="8" minOccurs="1" maxOccurs="1"/>
