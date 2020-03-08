@@ -105,6 +105,12 @@ static EbmlSyntax matroska_cluster_enter[] = {
 
         <!-- Master element comment header -->
         <xsl:if test="@type='master'">
+            <xsl:if test="@name='Cluster'">
+                <!-- Extra elements to do the (Simple)Block parsing -->
+                <xsl:text>&#10;// The following array contains SimpleBlock and BlockGroup twice</xsl:text>
+                <xsl:text>&#10;// in order to reuse the other values for matroska_cluster_enter.</xsl:text>
+            </xsl:if>
+
             <xsl:text>&#10;static EbmlSyntax matroska_</xsl:text>
             <xsl:call-template name="masterListName">
                 <xsl:with-param name="node" select="$node"/>
@@ -137,7 +143,17 @@ static EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:with-param name="recursive" select="@recursive"/>
                 </xsl:call-template>
             </xsl:if>
-            
+
+            <xsl:if test="@name='Cluster'">
+                <!-- Extra elements to do the (Simple)Block parsing -->
+                <xsl:text>    { MATROSKA_ID_SIMPLEBLOCK,              EBML_STOP },&#10;</xsl:text>
+                <xsl:text>    { MATROSKA_ID_BLOCKGROUP,               EBML_STOP },&#10;</xsl:text>
+            </xsl:if>
+            <xsl:if test="@name='BlockGroup'">
+                <!-- Extra elements to do the Block parsing -->
+                <xsl:text>    {                                    1, EBML_UINT,   0, offsetof(MatroskaBlock, non_simple), { .u = 1 } },&#10;</xsl:text>
+            </xsl:if>
+
             <xsl:choose>
                 <xsl:when test="@name='Segment'">
                     <xsl:text>    { 0 }   /* We don't want to go back to level 0, so don't add the parent. */&#10;</xsl:text>
@@ -553,6 +569,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:when test="$node/@name='ReferenceBlock'"><xsl:text>INT64_MIN</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='ChapterTimeStart'"><xsl:text>AV_NOPTS_VALUE</xsl:text></xsl:when>
                 <xsl:when test="$node/@name='ChapterTimeEnd'"><xsl:text>AV_NOPTS_VALUE</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='SeekPosition'"><xsl:text>-1</xsl:text></xsl:when>
                 <xsl:when test="$node/@default='0x1p+0'"><xsl:text>1.0</xsl:text></xsl:when>
                 <xsl:when test="$node/@default='0x0p+0'"><xsl:text>0.0</xsl:text></xsl:when>
                 <xsl:when test="$node/@default='0x1.f4p+12'"><xsl:text>8000.0</xsl:text></xsl:when>
@@ -689,6 +706,9 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         </xsl:when>
                         <xsl:when test="not($parentStructureFromList='')">
                             <xsl:value-of select="$parentStructureFromList"/>
+                        </xsl:when>
+                        <xsl:when test="@name='SimpleBlock'">
+                            <xsl:text>MatroskaBlock</xsl:text>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:call-template name="hardcodedStructure">
