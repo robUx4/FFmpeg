@@ -62,32 +62,47 @@ static EbmlSyntax ebml_header[] = {
     CHILD_OF(ebml_syntax)
 };
 
-static EbmlSyntax ebml_syntax[] = {
+EbmlSyntax ebml_syntax[] = {
     { EBML_ID_HEADER,      EBML_NEST, 0, 0, { .n = ebml_header } },
     { MATROSKA_ID_SEGMENT, EBML_STOP },
     { 0 }
 };
 </xsl:text>
 
-    <xsl:apply-templates select="ebml:element[@name='Segment']"/>
-    <!-- TODO even closer ordering with a "sort score"  https://stackoverflow.com/questions/1287651/xslt-custom-sort -->
+    <!-- Apply the ebml:element template on the Segment node -->
+    <!-- <xsl:apply-templates select="ebml:element[@name='Segment']"/> -->
+    <xsl:for-each select="ebml:element[@type = 'master']">
+        <!-- TODO even closer ordering with a "sort score"  https://stackoverflow.com/questions/1287651/xslt-custom-sort -->
+        <xsl:sort select="not(@name='Info')" />
+        <!-- <xsl:sort select="not(@name='MasteringMetadata')" />
+        <xsl:sort select="not(@name='Colour')" />
+        <xsl:sort select="not(@name='Video')" />
+        <xsl:sort select="not(@name='Audio')" />
+        <xsl:sort select="not(@name='ContentCompression')" />
+        <xsl:sort select="not(@name='ContentEncryption')" />
+        <xsl:sort select="not(@name='ContentEncoding')" />
+        <xsl:sort select="not(@name='ContentEncodings')" />
+        <xsl:sort select="not(@name='TrackPlane')" />
+        <xsl:sort select="not(@name='TrackCombinePlanes') and not(@name='TrackOperation')" />
+        <xsl:sort select="not(@name='TrackEntry') and not(@name='Tracks')" /> -->
+        <xsl:sort select="substring( @path, 1, string-length(@path)-string-length(@name) )" order="descending"/>
+        <xsl:sort select="@name" order="ascending"/>
+        <xsl:sort select="not(@name='Audio')" />
+        <xsl:sort select="not(@name='Video')" />
+        <xsl:sort select="not(@name='Projection')" />
 
-    <xsl:for-each select="ebml:element">
-        <!-- <Parent path>/<id> -->
-        <xsl:sort select="concat(
-            substring( @path, 1, string-length(@path)-string-length(@name) ),
-            @id
-        )" />
-
+        <xsl:call-template name="parsePath">
+            <xsl:with-param name="node" select="."/>
+        </xsl:call-template>
     </xsl:for-each>
 
 <xsl:text>
-static EbmlSyntax matroska_segments[] = {
+EbmlSyntax matroska_segments[] = {
     { MATROSKA_ID_SEGMENT, EBML_NEST, 0, 0, { .n = matroska_segment } },
     { 0 }
 };
 
-static EbmlSyntax matroska_cluster_enter[] = {
+EbmlSyntax matroska_cluster_enter[] = {
     { MATROSKA_ID_CLUSTER,     EBML_NEST, 0, 0, { .n = &amp;matroska_cluster_parsing[2] } },
     { 0 }
 };
@@ -95,10 +110,29 @@ static EbmlSyntax matroska_cluster_enter[] = {
 
   </xsl:template>
 
-    <xsl:template match="ebml:element">
+    <xsl:template name="masterSort2">
+        <xsl:param name="node"/>
         <xsl:call-template name="parsePath">
             <xsl:with-param name="node" select="."/>
         </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="syntaxIsShared">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/@name='Colour'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackPlane'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackCombinePlanes'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncodings'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackOperation'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Video'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackEntry'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Tag'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Tags'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Tracks'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Segment'"><xsl:text>y</xsl:text></xsl:when>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="parsePath">
@@ -112,7 +146,22 @@ static EbmlSyntax matroska_cluster_enter[] = {
                 <xsl:text>&#10;// in order to reuse the other values for matroska_cluster_enter.</xsl:text>
             </xsl:if>
 
-            <xsl:text>&#10;static EbmlSyntax matroska_</xsl:text>
+<!-- <xsl:value-of select="concat(
+            substring( $node/@path, 1, string-length($node/@path)-string-length($node/@name) ),
+            $node/@id
+        )"/> -->
+<!-- <xsl:value-of select="$node/@path"/> -->
+
+            <xsl:text>&#10;</xsl:text>
+            <xsl:variable name="isShared">
+                <xsl:call-template name="syntaxIsShared">
+                    <xsl:with-param name="node" select="."/>
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:if test="$isShared=''">
+                <xsl:text>static </xsl:text>
+            </xsl:if>
+            <xsl:text>EbmlSyntax matroska_</xsl:text>
             <xsl:call-template name="masterListName">
                 <xsl:with-param name="node" select="$node"/>
             </xsl:call-template>
@@ -124,6 +173,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
             <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
                                   /ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
                 <xsl:sort select="not(@name='Info')" />
+                <xsl:sort select="not(@name='MasteringMetadata')" />
                 <xsl:sort select="not(@name='Tracks')" />
                 <xsl:sort select="not(@name='Cues')" />
                 <xsl:sort select="not(@name='Tags')" />
@@ -174,7 +224,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
             </xsl:choose>
             <xsl:text>};&#10;</xsl:text>
 
-            <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)] | 
+            <!-- <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)] | 
                                   ../ebml:element[@path = concat(concat($node/@path, '\+'), @name)]">
                 <xsl:sort select="not(@name='Info')" />
                 <xsl:sort select="not(@name='Tracks')" />
@@ -188,7 +238,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
                         <xsl:with-param name="node" select="."/>
                     </xsl:call-template>
                 </xsl:if>
-            </xsl:for-each>
+            </xsl:for-each> -->
 
         </xsl:if>
 
