@@ -696,7 +696,7 @@ static EbmlSyntax matroska_cluster_enter[] = {
             </xsl:choose>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="$ebmlType='EBML_NONE' and not($node/@type='master')">
+            <xsl:when test="$ebmlType='EBML_NONE'">
                 <xsl:value-of select="$ebmlType"/>
             </xsl:when>
             <xsl:when test="$ebmlType='EBML_STOP'">
@@ -710,6 +710,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
         <!-- generate EbmlSyntax.list_elem_size -->
         <xsl:choose>
             <xsl:when test="$lavfStorage='STOP'">
+            </xsl:when>
+            <xsl:when test="$ebmlType='EBML_NONE' and @type='master'">
             </xsl:when>
             <xsl:when test="$lavfListElementSize='' and not($lavfDefault='')">
                 <xsl:text>0, </xsl:text>
@@ -731,6 +733,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
         <!-- generate EbmlSyntax.data_offset -->
         <xsl:choose>
             <xsl:when test="$lavfStorage='STOP'">
+            </xsl:when>
+            <xsl:when test="$ebmlType='EBML_NONE' and @type='master'">
             </xsl:when>
             <xsl:when test="$lavfStorage='' and not($lavfDefault='')">
                 <xsl:text>0</xsl:text>
@@ -777,6 +781,8 @@ static EbmlSyntax matroska_cluster_enter[] = {
         <!-- generate EbmlSyntax.def -->
         <xsl:choose>
             <xsl:when test="$lavfStorage='STOP'">
+            </xsl:when>
+            <xsl:when test="$ebmlType='EBML_NONE' and @type='master'">
             </xsl:when>
             <xsl:when test="$lavfDefault=''">
             </xsl:when>
