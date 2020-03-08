@@ -148,11 +148,63 @@ EbmlSyntax matroska_cluster_enter[] = {
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="ebml:EBMLSchema/ebml:element">
+    <!-- TODO remove this and list all the known elements in the EBML Schema -->
+    <xsl:template name="discardNewElement">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/@name='LanguageIETF'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='GammaValue'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='OldStereoMode'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackJoinBlocks'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChannelPositions'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='DefaultDecodedFieldDuration'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CodecSettings'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackOffset'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackOverlay'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickTrackUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickTrackSegmentUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickMasterTrackSegmentUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickTrackFlag'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickMasterTrackUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='BlockAdditionMapping'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackTranslate'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TagEditionUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TagLanguageIETF'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TagBinary'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='PrevFilename'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='PrevUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='NextFilename'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='NextUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='SegmentFamily'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='SegmentFilename'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterTranslate'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CueCodecState'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CueReference'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='BlockVirtual'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ReferencePriority'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ReferenceVirtual'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Slices'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ReferenceFrame'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='EncryptedBlock'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='SilentTracks'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapLanguageIETF'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterStringUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterSegmentUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterSegmentEditionUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapProcess'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterTrack'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='FileUsedStartTime'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='FileUsedEndTime'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='FileReferral'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='AttachmentLink'"><xsl:text>y</xsl:text></xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- <xsl:template match="ebml:EBMLSchema/ebml:element">
         <xsl:call-template name="outputChildEbmlSyntax">
             <xsl:with-param name="node" select="."/>
         </xsl:call-template>
-    </xsl:template>
+    </xsl:template> -->
 
     <xsl:template name="parsePath">
         <xsl:param name="node"/>
@@ -202,8 +254,8 @@ EbmlSyntax matroska_cluster_enter[] = {
             </xsl:apply-templates> -->
 
 
-            <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
-                                  /ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
+            <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
+                                  ../ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
                     <!-- Common elements that should be found early when parsing -->
                     <xsl:sort select="not(@name='Cluster')"/>
                     <xsl:sort select="not(@name='TrackNumber')"/>
@@ -219,9 +271,17 @@ EbmlSyntax matroska_cluster_enter[] = {
                     <xsl:sort select="@type='master'"/>
                 <xsl:sort select="@id" />
 
-                <xsl:call-template name="outputChildEbmlSyntax">
-                    <xsl:with-param name="node" select="."/>
-                </xsl:call-template>
+                <xsl:variable name="isDiscarded">
+                    <xsl:call-template name="discardNewElement">
+                        <xsl:with-param name="node" select="."/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:if test="$isDiscarded=''">
+                    <xsl:call-template name="outputChildEbmlSyntax">
+                        <xsl:with-param name="node" select="."/>
+                    </xsl:call-template>
+                </xsl:if>
 
             </xsl:for-each>
 
@@ -261,22 +321,6 @@ EbmlSyntax matroska_cluster_enter[] = {
             </xsl:choose>
             <xsl:text>};&#10;</xsl:text>
 
-            <!-- <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)] | 
-                                  ../ebml:element[@path = concat(concat($node/@path, '\+'), @name)]">
-                <xsl:sort select="not(@name='Info')" />
-                <xsl:sort select="not(@name='Tracks')" />
-                <xsl:sort select="not(@name='Cues')" />
-                <xsl:sort select="not(@name='Tags')" />
-                <xsl:sort select="@name='Chapters'" />
-                <xsl:sort select="@name='Audio'" />
-                <xsl:sort select="@name" />
-                <xsl:if test="@type='master'">
-                    <xsl:call-template name="parsePath">
-                        <xsl:with-param name="node" select="."/>
-                    </xsl:call-template>
-                </xsl:if>
-            </xsl:for-each> -->
-
         </xsl:if>
 
     </xsl:template>
@@ -307,8 +351,8 @@ EbmlSyntax matroska_cluster_enter[] = {
     <xsl:template name="masterHasStoredElts">
         <xsl:param name="node"/>
         
-        <xsl:for-each select="/ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
-                              /ebml:EBMLSchema/ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
+        <xsl:for-each select="../ebml:element[@path = concat(concat($node/@path, '\'), @name)] |
+                              ../ebml:element[@path = concat(concat($node/@path, '\+'), @name)] ">
             <xsl:variable name="lavfStorage">
                 <xsl:choose>
                     <xsl:when test="@type='master'">
@@ -634,6 +678,7 @@ EbmlSyntax matroska_cluster_enter[] = {
         </xsl:variable>
     
 <!-- <xsl:value-of select="$lavfName"/> -->
+<!-- <xsl:value-of select="$node/@name"/> -->
 
         <!-- Storage name in a structure if any -->
         <!-- Master elements are assumed to be always stored -->
