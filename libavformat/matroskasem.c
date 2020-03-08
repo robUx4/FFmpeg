@@ -78,18 +78,18 @@ static EbmlSyntax matroska_mastering_meta[] = {
 
 EbmlSyntax matroska_track_video_color[] = {
     { MATROSKA_ID_VIDEOCOLORMATRIXCOEFF,      EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, matrix_coefficients), { .u = AVCOL_SPC_UNSPECIFIED } },
-    { MATROSKA_ID_VIDEOCOLORBITSPERCHANNEL,   EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, bits_per_channel), { .u=0 } },
-    { MATROSKA_ID_VIDEOCOLORCHROMASUBHORZ,    EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, chroma_sub_horz), { .u=0 } },
-    { MATROSKA_ID_VIDEOCOLORCHROMASUBVERT,    EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, chroma_sub_vert), { .u=0 } },
-    { MATROSKA_ID_VIDEOCOLORCBSUBHORZ,        EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, cb_sub_horz), { .u=0 } },
-    { MATROSKA_ID_VIDEOCOLORCBSUBVERT,        EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, cb_sub_vert), { .u=0 } },
+    { MATROSKA_ID_VIDEOCOLORBITSPERCHANNEL,   EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, bits_per_channel) },
+    { MATROSKA_ID_VIDEOCOLORCHROMASUBHORZ,    EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, chroma_sub_horz) },
+    { MATROSKA_ID_VIDEOCOLORCHROMASUBVERT,    EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, chroma_sub_vert) },
+    { MATROSKA_ID_VIDEOCOLORCBSUBHORZ,        EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, cb_sub_horz) },
+    { MATROSKA_ID_VIDEOCOLORCBSUBVERT,        EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, cb_sub_vert) },
     { MATROSKA_ID_VIDEOCOLORCHROMASITINGHORZ, EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, chroma_siting_horz), { .u = MATROSKA_COLOUR_CHROMASITINGHORZ_UNDETERMINED } },
     { MATROSKA_ID_VIDEOCOLORCHROMASITINGVERT, EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, chroma_siting_vert), { .u = MATROSKA_COLOUR_CHROMASITINGVERT_UNDETERMINED } },
     { MATROSKA_ID_VIDEOCOLORRANGE,            EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, range), { .u = AVCOL_RANGE_UNSPECIFIED } },
     { MATROSKA_ID_VIDEOCOLORTRANSFERCHARACTERISTICS, EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, transfer_characteristics), { .u = AVCOL_TRC_UNSPECIFIED } },
     { MATROSKA_ID_VIDEOCOLORPRIMARIES,        EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, primaries), { .u = AVCOL_PRI_UNSPECIFIED } },
-    { MATROSKA_ID_VIDEOCOLORMAXCLL,           EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, max_cll), { .u=0 } },
-    { MATROSKA_ID_VIDEOCOLORMAXFALL,          EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, max_fall), { .u=0 } },
+    { MATROSKA_ID_VIDEOCOLORMAXCLL,           EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, max_cll) },
+    { MATROSKA_ID_VIDEOCOLORMAXFALL,          EBML_UINT, 0, offsetof(MatroskaTrackVideoColor, max_fall) },
     { MATROSKA_ID_VIDEOCOLORMASTERINGMETA,    EBML_NEST, 0, offsetof(MatroskaTrackVideoColor, mastering_meta), { .n = matroska_mastering_meta } },
     CHILD_OF(matroska_track_video)
 };
@@ -133,7 +133,7 @@ EbmlSyntax matroska_track_operation[] = {
 };
 
 static EbmlSyntax matroska_track_encoding_encryption[] = {
-    { MATROSKA_ID_ENCODINGENCALGO,        EBML_UINT, 0, offsetof(MatroskaTrackEncryption,algo), {.u = 0} },
+    { MATROSKA_ID_ENCODINGENCALGO,        EBML_UINT, 0, offsetof(MatroskaTrackEncryption,algo) },
     { MATROSKA_ID_ENCODINGENCKEYID,       EBML_BIN, 0, offsetof(MatroskaTrackEncryption,key_id) },
     { MATROSKA_ID_ENCODINGSIGNATURE,      EBML_NONE },
     { MATROSKA_ID_ENCODINGSIGKEYID,       EBML_NONE },
@@ -144,7 +144,7 @@ static EbmlSyntax matroska_track_encoding_encryption[] = {
 };
 
 static EbmlSyntax matroska_track_encoding_compression[] = {
-    { MATROSKA_ID_ENCODINGCOMPALGO,     EBML_UINT, 0, offsetof(MatroskaTrackCompression, algo), { .u = 0 } },
+    { MATROSKA_ID_ENCODINGCOMPALGO,     EBML_UINT, 0, offsetof(MatroskaTrackCompression, algo) },
     { MATROSKA_ID_ENCODINGCOMPSETTINGS, EBML_BIN,  0, offsetof(MatroskaTrackCompression, settings) },
     CHILD_OF(matroska_track_encoding)
 };
@@ -152,7 +152,7 @@ static EbmlSyntax matroska_track_encoding_compression[] = {
 EbmlSyntax matroska_track_encoding[] = {
     { MATROSKA_ID_ENCODINGORDER,       EBML_NONE },
     { MATROSKA_ID_ENCODINGSCOPE,       EBML_UINT, 0, offsetof(MatroskaTrackEncoding, scope),       { .u = 1 } },
-    { MATROSKA_ID_ENCODINGTYPE,        EBML_UINT, 0, offsetof(MatroskaTrackEncoding, type),        { .u = 0 } },
+    { MATROSKA_ID_ENCODINGTYPE,        EBML_UINT, 0, offsetof(MatroskaTrackEncoding, type) },
     { MATROSKA_ID_ENCODINGCOMPRESSION, EBML_NEST, 0, offsetof(MatroskaTrackEncoding, compression), { .n = matroska_track_encoding_compression } },
     { MATROSKA_ID_ENCODINGENCRYPTION,  EBML_NEST, 0, offsetof(MatroskaTrackEncoding, encryption),  { .n = matroska_track_encoding_encryption } },
     CHILD_OF(matroska_track_encodings)
@@ -182,7 +182,7 @@ EbmlSyntax matroska_track[] = {
     { MATROSKA_ID_CODECDOWNLOADURL,      EBML_NONE },
     { MATROSKA_ID_CODECINFOURL,          EBML_NONE },
     { MATROSKA_ID_TRACKNAME,             EBML_UTF8,  0, offsetof(MatroskaTrack, name) },
-    { MATROSKA_ID_TRACKFLAGFORCED,       EBML_UINT,  0, offsetof(MatroskaTrack, flag_forced),  { .u = 0 } },
+    { MATROSKA_ID_TRACKFLAGFORCED,       EBML_UINT,  0, offsetof(MatroskaTrack, flag_forced) },
     { MATROSKA_ID_TRACKMAXBLKADDID,      EBML_UINT,  0, offsetof(MatroskaTrack, max_block_additional_id) },
     { MATROSKA_ID_CODECDELAY,            EBML_UINT,  0, offsetof(MatroskaTrack, codec_delay) },
     { MATROSKA_ID_SEEKPREROLL,           EBML_UINT,  0, offsetof(MatroskaTrack, seek_preroll) },
