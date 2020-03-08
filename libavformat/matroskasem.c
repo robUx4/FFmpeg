@@ -36,7 +36,7 @@
 
 #define CHILD_OF(parent) { .def = { .n = parent } }
 
-EbmlSyntax ebml_header[] = {
+static EbmlSyntax ebml_header[] = {
     { EBML_ID_EBMLREADVERSION,    EBML_UINT, 0, offsetof(Ebml, version),         { .u = EBML_VERSION } },
     { EBML_ID_EBMLMAXSIZELENGTH,  EBML_UINT, 0, offsetof(Ebml, max_size),        { .u = 8 } },
     { EBML_ID_EBMLMAXIDLENGTH,    EBML_UINT, 0, offsetof(Ebml, id_length),       { .u = 4 } },
@@ -53,7 +53,7 @@ EbmlSyntax ebml_syntax[] = {
     { 0 }
 };
 
-EbmlSyntax matroska_info[] = {
+static EbmlSyntax matroska_info[] = {
     { MATROSKA_ID_TIMECODESCALE, EBML_UINT,  0, offsetof(MatroskaDemuxContext, time_scale), { .u = 1000000 } },
     { MATROSKA_ID_DURATION,      EBML_FLOAT, 0, offsetof(MatroskaDemuxContext, duration) },
     { MATROSKA_ID_TITLE,         EBML_UTF8,  0, offsetof(MatroskaDemuxContext, title) },
@@ -64,7 +64,7 @@ EbmlSyntax matroska_info[] = {
     CHILD_OF(matroska_segment)
 };
 
-EbmlSyntax matroska_mastering_meta[] = {
+static EbmlSyntax matroska_mastering_meta[] = {
     { MATROSKA_ID_VIDEOCOLOR_RX, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, r_x), { .f=-1 } },
     { MATROSKA_ID_VIDEOCOLOR_RY, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, r_y), { .f=-1 } },
     { MATROSKA_ID_VIDEOCOLOR_GX, EBML_FLOAT, 0, offsetof(MatroskaMasteringMeta, g_x), { .f=-1 } },
@@ -96,7 +96,7 @@ EbmlSyntax matroska_track_video_color[] = {
     CHILD_OF(matroska_track_video)
 };
 
-EbmlSyntax matroska_track_video_projection[] = {
+static EbmlSyntax matroska_track_video_projection[] = {
     { MATROSKA_ID_VIDEOPROJECTIONTYPE,        EBML_UINT,  0, offsetof(MatroskaTrackVideoProjection, type), { .u = MATROSKA_VIDEO_PROJECTION_TYPE_RECTANGULAR } },
     { MATROSKA_ID_VIDEOPROJECTIONPRIVATE,     EBML_BIN,   0, offsetof(MatroskaTrackVideoProjection, private) },
     { MATROSKA_ID_VIDEOPROJECTIONPOSEYAW,     EBML_FLOAT, 0, offsetof(MatroskaTrackVideoProjection, yaw), { .f=0.0 } },
@@ -127,7 +127,7 @@ EbmlSyntax matroska_track_video[] = {
     CHILD_OF(matroska_track)
 };
 
-EbmlSyntax matroska_track_audio[] = {
+static EbmlSyntax matroska_track_audio[] = {
     { MATROSKA_ID_AUDIOSAMPLINGFREQ,    EBML_FLOAT, 0, offsetof(MatroskaTrackAudio, samplerate), { .f = 8000.0 } },
     { MATROSKA_ID_AUDIOOUTSAMPLINGFREQ, EBML_FLOAT, 0, offsetof(MatroskaTrackAudio, out_samplerate) },
     { MATROSKA_ID_AUDIOBITDEPTH,        EBML_UINT,  0, offsetof(MatroskaTrackAudio, bitdepth) },
@@ -135,13 +135,13 @@ EbmlSyntax matroska_track_audio[] = {
     CHILD_OF(matroska_track)
 };
 
-EbmlSyntax matroska_track_encoding_compression[] = {
+static EbmlSyntax matroska_track_encoding_compression[] = {
     { MATROSKA_ID_ENCODINGCOMPALGO,     EBML_UINT, 0, offsetof(MatroskaTrackCompression, algo), { .u = 0 } },
     { MATROSKA_ID_ENCODINGCOMPSETTINGS, EBML_BIN,  0, offsetof(MatroskaTrackCompression, settings) },
     CHILD_OF(matroska_track_encoding)
 };
 
-EbmlSyntax matroska_track_encoding_encryption[] = {
+static EbmlSyntax matroska_track_encoding_encryption[] = {
     { MATROSKA_ID_ENCODINGENCALGO,        EBML_UINT, 0, offsetof(MatroskaTrackEncryption,algo), {.u = 0} },
     { MATROSKA_ID_ENCODINGENCKEYID,       EBML_BIN, 0, offsetof(MatroskaTrackEncryption,key_id) },
     { MATROSKA_ID_ENCODINGENCAESSETTINGS, EBML_NONE },
@@ -151,6 +151,7 @@ EbmlSyntax matroska_track_encoding_encryption[] = {
     { MATROSKA_ID_ENCODINGSIGNATURE,      EBML_NONE },
     CHILD_OF(matroska_track_encoding)
 };
+
 EbmlSyntax matroska_track_encoding[] = {
     { MATROSKA_ID_ENCODINGSCOPE,       EBML_UINT, 0, offsetof(MatroskaTrackEncoding, scope),       { .u = 1 } },
     { MATROSKA_ID_ENCODINGTYPE,        EBML_UINT, 0, offsetof(MatroskaTrackEncoding, type),        { .u = 0 } },
@@ -216,7 +217,7 @@ EbmlSyntax matroska_tracks[] = {
     CHILD_OF(matroska_segment)
 };
 
-EbmlSyntax matroska_attachment[] = {
+static EbmlSyntax matroska_attachment[] = {
     { MATROSKA_ID_FILEUID,      EBML_UINT, 0, offsetof(MatroskaAttachment, uid) },
     { MATROSKA_ID_FILENAME,     EBML_UTF8, 0, offsetof(MatroskaAttachment, filename) },
     { MATROSKA_ID_FILEMIMETYPE, EBML_STR,  0, offsetof(MatroskaAttachment, mime) },
@@ -230,7 +231,7 @@ EbmlSyntax matroska_attachments[] = {
     CHILD_OF(matroska_segment)
 };
 
-EbmlSyntax matroska_chapter_display[] = {
+static EbmlSyntax matroska_chapter_display[] = {
     { MATROSKA_ID_CHAPSTRING,  EBML_UTF8, 0, offsetof(MatroskaChapter, title) },
     { MATROSKA_ID_CHAPLANG,    EBML_NONE },
     { MATROSKA_ID_CHAPCOUNTRY, EBML_NONE },
@@ -263,7 +264,7 @@ EbmlSyntax matroska_chapters[] = {
     CHILD_OF(matroska_segment)
 };
 
-EbmlSyntax matroska_index_pos[] = {
+static EbmlSyntax matroska_index_pos[] = {
     { MATROSKA_ID_CUETRACK,           EBML_UINT, 0, offsetof(MatroskaIndexPos, track) },
     { MATROSKA_ID_CUECLUSTERPOSITION, EBML_UINT, 0, offsetof(MatroskaIndexPos, pos) },
     { MATROSKA_ID_CUERELATIVEPOSITION,EBML_NONE },
@@ -283,7 +284,7 @@ EbmlSyntax matroska_index[] = {
     CHILD_OF(matroska_segment)
 };
 
-EbmlSyntax matroska_simpletag[] = {
+static EbmlSyntax matroska_simpletag[] = {
     { MATROSKA_ID_TAGNAME,        EBML_UTF8, 0,                   offsetof(MatroskaTag, name) },
     { MATROSKA_ID_TAGSTRING,      EBML_UTF8, 0,                   offsetof(MatroskaTag, string) },
     { MATROSKA_ID_TAGLANG,        EBML_STR,  0,                   offsetof(MatroskaTag, lang), { .s = "und" } },
@@ -293,7 +294,7 @@ EbmlSyntax matroska_simpletag[] = {
     CHILD_OF(matroska_tag)
 };
 
-EbmlSyntax matroska_tagtargets[] = {
+static EbmlSyntax matroska_tagtargets[] = {
     { MATROSKA_ID_TAGTARGETS_TYPE,       EBML_STR,  0, offsetof(MatroskaTagTarget, type) },
     { MATROSKA_ID_TAGTARGETS_TYPEVALUE,  EBML_UINT, 0, offsetof(MatroskaTagTarget, typevalue), { .u = 50 } },
     { MATROSKA_ID_TAGTARGETS_TRACKUID,   EBML_UINT, 0, offsetof(MatroskaTagTarget, trackuid) },
@@ -313,7 +314,7 @@ EbmlSyntax matroska_tags[] = {
     CHILD_OF(matroska_segment)
 };
 
-EbmlSyntax matroska_seekhead_entry[] = {
+static EbmlSyntax matroska_seekhead_entry[] = {
     { MATROSKA_ID_SEEKID,       EBML_UINT, 0, offsetof(MatroskaSeekhead, id) },
     { MATROSKA_ID_SEEKPOSITION, EBML_UINT, 0, offsetof(MatroskaSeekhead, pos), { .u = -1 } },
     CHILD_OF(matroska_seekhead)
@@ -341,13 +342,13 @@ EbmlSyntax matroska_segments[] = {
     { 0 }
 };
 
-EbmlSyntax matroska_blockmore[] = {
+static EbmlSyntax matroska_blockmore[] = {
     { MATROSKA_ID_BLOCKADDID,      EBML_UINT, 0, offsetof(MatroskaBlock,additional_id), { .u = 1 } },
     { MATROSKA_ID_BLOCKADDITIONAL, EBML_BIN,  0, offsetof(MatroskaBlock,additional) },
     CHILD_OF(matroska_blockadditions)
 };
 
-EbmlSyntax matroska_blockadditions[] = {
+static EbmlSyntax matroska_blockadditions[] = {
     { MATROSKA_ID_BLOCKMORE, EBML_NEST, 0, 0, {.n = matroska_blockmore} },
     CHILD_OF(matroska_blockgroup)
 };
