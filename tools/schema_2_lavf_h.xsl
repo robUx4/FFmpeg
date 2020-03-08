@@ -47,10 +47,12 @@
 
     <xsl:for-each select="ebml:element">
         <!-- <Parent path>/<id> -->
-        <xsl:sort select="concat(
+        <!-- <xsl:sort select="concat(
             substring( @path, 1, string-length(@path)-string-length(@name) ),
             @id
-        )" />
+        )" /> -->
+        <xsl:sort select="not(@name='TrackType')"/>
+        <xsl:sort select="not(@name='ContentCompAlgo')"/>
 
         <!-- Output the enums after the IDs -->
         <xsl:call-template name="outputAllEnums"/>
@@ -112,6 +114,29 @@
             <xsl:when test="$node/@name='FileUsedEndTime'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='FileReferral'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='AttachmentLink'"><xsl:text>y</xsl:text></xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="discardStructure">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/@name='TransferCharacteristics'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Range'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Primaries'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='AspectRatioType'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='MatrixCoefficients'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='OldStereoMode'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapProcessTime'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterTranslateCodec'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TargetTypeValue'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncodingScope'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncodingType'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentEncAlgo'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentSigAlgo'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ContentSigHashAlgo'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='AESSettingsCipherMode'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackPlaneType'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackTranslateCodec'"><xsl:text>y</xsl:text></xsl:when>
         </xsl:choose>
     </xsl:template>
 
@@ -307,77 +332,86 @@
 
 
     <xsl:template name="outputAllEnums">
-        <xsl:if test="ebml:restriction/ebml:enum and @type!='string'">
-            <xsl:variable name="prefix">
+        <xsl:variable name="isDiscarded">
+            <xsl:call-template name="discardStructure">
+                <xsl:with-param name="node" select="."/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:if test="$isDiscarded=''">
+
+            <xsl:if test="ebml:restriction/ebml:enum and @type!='string'">
+                <xsl:variable name="prefix">
+                    <xsl:choose>
+                        <xsl:when test="@name='ContentCompAlgo'">TRACK_ENCODING_COMP</xsl:when>
+                        <xsl:when test="@name='TrackType'">TRACK_TYPE</xsl:when>
+                        <xsl:when test="@name='ProjectionType'">VIDEO_PROJECTION_TYPE</xsl:when>
+                        <xsl:when test="@name='FlagInterlaced'">VIDEO_INTERLACE_FLAG</xsl:when>
+                        <xsl:when test="@name='StereoMode'">VIDEO_STEREOMODE_TYPE</xsl:when>
+                        <xsl:when test="contains(@path,'\TrackEntry\Video\Colour\')"><xsl:text>COLOUR_</xsl:text><xsl:value-of select="@name"/></xsl:when>
+                        <xsl:when test="contains(@path,'\TrackEntry\Video\')"><xsl:text>VIDEO_</xsl:text><xsl:value-of select="@name"/></xsl:when>
+                        <xsl:otherwise><xsl:value-of select="@name"/></xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <xsl:variable name="align" as="xs:integer">
+                    <!-- padding added in structures to have fancy alignment -->
+                    <xsl:choose>
+                        <xsl:when test="@name='ContentCompAlgo'">12</xsl:when>
+                        <xsl:when test="@name='TrackType'">9</xsl:when>
+                        <xsl:when test="@name='ProjectionType'">19</xsl:when>
+                        <xsl:when test="@name='FlagInterlaced'">13</xsl:when>
+                        <xsl:when test="@name='StereoMode'">19</xsl:when>
+                        <xsl:when test="@name='DisplayUnit'">12</xsl:when>
+                        <xsl:when test="@name='FieldOrder'">13</xsl:when>
+                        <xsl:otherwise>17</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <xsl:text>typedef enum {&#10;</xsl:text>
+
+                <!-- Internal value not found in the specs -->
+                <xsl:if test="@name='TrackType'"><xsl:text>  MATROSKA_TRACK_TYPE_NONE     = 0x0,&#10;</xsl:text></xsl:if>
+
+                <xsl:for-each select="ebml:restriction/ebml:enum">
+                    <xsl:sort select="value"/>
+                    <xsl:text>  MATROSKA_</xsl:text>
+                    <xsl:value-of select="translate($prefix, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+                    <xsl:text>_</xsl:text>
+                    <xsl:call-template name="outputEnumLabel">
+                        <xsl:with-param name="label" select="@label"/>
+                        <xsl:with-param name="align" select="$align"/>
+                    </xsl:call-template>
+
+                    <xsl:text> = </xsl:text>
+                    <xsl:choose>
+                        <xsl:when test="$prefix='TRACK_TYPE'">
+                            <xsl:call-template name="ConvertToHex">
+                                <xsl:with-param name="index" select="@value"/>
+                            </xsl:call-template>
+                        </xsl:when>
+                        <xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:text>,&#10;</xsl:text>
+                </xsl:for-each>
+
+                <!-- Extra enum count -->
                 <xsl:choose>
-                    <xsl:when test="@name='ContentCompAlgo'">TRACK_ENCODING_COMP</xsl:when>
-                    <xsl:when test="@name='TrackType'">TRACK_TYPE</xsl:when>
-                    <xsl:when test="@name='ProjectionType'">VIDEO_PROJECTION_TYPE</xsl:when>
-                    <xsl:when test="@name='FlagInterlaced'">VIDEO_INTERLACE_FLAG</xsl:when>
-                    <xsl:when test="@name='StereoMode'">VIDEO_STEREOMODE_TYPE</xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\Colour\')"><xsl:text>COLOUR_</xsl:text><xsl:value-of select="@name"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\')"><xsl:text>VIDEO_</xsl:text><xsl:value-of select="@name"/></xsl:when>
+                    <xsl:when test="@name='ChromaSitingHorz'"><xsl:text>  MATROSKA_COLOUR_CHROMASITINGHORZ_NB&#10;</xsl:text></xsl:when>
+                    <xsl:when test="@name='ChromaSitingVert'"><xsl:text>  MATROSKA_COLOUR_CHROMASITINGVERT_NB&#10;</xsl:text></xsl:when>
+                    <xsl:when test="@name='StereoMode'"><xsl:text>  MATROSKA_VIDEO_STEREOMODE_TYPE_NB,&#10;</xsl:text></xsl:when>
+                </xsl:choose>
+
+                <xsl:text>} Matroska</xsl:text>
+                <xsl:choose>
+                    <xsl:when test="@name='ContentCompAlgo'"><xsl:text>TrackEncodingCompAlgo</xsl:text></xsl:when>
+                    <xsl:when test="@name='ChromaSitingHorz'"><xsl:text>ColourChromaSitingHorz</xsl:text></xsl:when>
+                    <xsl:when test="@name='ChromaSitingVert'"><xsl:text>ColourChromaSitingVert</xsl:text></xsl:when>
+                    <xsl:when test="@name='FlagInterlaced'"><xsl:text>VideoInterlaceFlag</xsl:text></xsl:when>
+                    <xsl:when test="@name='StereoMode'"><xsl:text>VideoStereoModeType</xsl:text></xsl:when>
+                    <xsl:when test="contains(@path,'\TrackEntry\Video\')"><xsl:text>Video</xsl:text><xsl:value-of select="@name"/></xsl:when>
                     <xsl:otherwise><xsl:value-of select="@name"/></xsl:otherwise>
                 </xsl:choose>
-            </xsl:variable>
-            <xsl:variable name="align" as="xs:integer">
-                <!-- padding added in structures to have fancy alignment -->
-                <xsl:choose>
-                    <xsl:when test="@name='ContentCompAlgo'">12</xsl:when>
-                    <xsl:when test="@name='TrackType'">9</xsl:when>
-                    <xsl:when test="@name='ProjectionType'">19</xsl:when>
-                    <xsl:when test="@name='FlagInterlaced'">13</xsl:when>
-                    <xsl:when test="@name='StereoMode'">19</xsl:when>
-                    <xsl:when test="@name='DisplayUnit'">12</xsl:when>
-                    <xsl:when test="@name='FieldOrder'">13</xsl:when>
-                    <xsl:otherwise>17</xsl:otherwise>
-                </xsl:choose>
-            </xsl:variable>
-            <xsl:text>typedef enum {&#10;</xsl:text>
-
-            <!-- Internal value not found in the specs -->
-            <xsl:if test="@name='TrackType'"><xsl:text>  MATROSKA_TRACK_TYPE_NONE     = 0x0,&#10;</xsl:text></xsl:if>
-
-            <xsl:for-each select="ebml:restriction/ebml:enum">
-                <xsl:sort select="value"/>
-                <xsl:text>  MATROSKA_</xsl:text>
-                <xsl:value-of select="translate($prefix, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
-                <xsl:text>_</xsl:text>
-                <xsl:call-template name="outputEnumLabel">
-                    <xsl:with-param name="label" select="@label"/>
-                    <xsl:with-param name="align" select="$align"/>
-                </xsl:call-template>
-
-                <xsl:text> = </xsl:text>
-                <xsl:choose>
-                    <xsl:when test="$prefix='TRACK_TYPE'">
-                        <xsl:call-template name="ConvertToHex">
-                            <xsl:with-param name="index" select="@value"/>
-                        </xsl:call-template>
-                    </xsl:when>
-                    <xsl:otherwise><xsl:value-of select="@value"/></xsl:otherwise>
-                </xsl:choose>
-                <xsl:text>,&#10;</xsl:text>
-            </xsl:for-each>
-
-            <!-- Extra enum count -->
-            <xsl:choose>
-                <xsl:when test="@name='ChromaSitingHorz'"><xsl:text>  MATROSKA_COLOUR_CHROMASITINGHORZ_NB&#10;</xsl:text></xsl:when>
-                <xsl:when test="@name='ChromaSitingVert'"><xsl:text>  MATROSKA_COLOUR_CHROMASITINGVERT_NB&#10;</xsl:text></xsl:when>
-                <xsl:when test="@name='StereoMode'"><xsl:text>  MATROSKA_VIDEO_STEREOMODE_TYPE_NB,&#10;</xsl:text></xsl:when>
-            </xsl:choose>
-
-            <xsl:text>} Matroska</xsl:text>
-            <xsl:choose>
-                <xsl:when test="@name='ContentCompAlgo'"><xsl:text>TrackEncodingCompAlgo</xsl:text></xsl:when>
-                <xsl:when test="@name='ChromaSitingHorz'"><xsl:text>ColourChromaSitingHorz</xsl:text></xsl:when>
-                <xsl:when test="@name='ChromaSitingVert'"><xsl:text>ColourChromaSitingVert</xsl:text></xsl:when>
-                <xsl:when test="@name='FlagInterlaced'"><xsl:text>VideoInterlaceFlag</xsl:text></xsl:when>
-                <xsl:when test="@name='StereoMode'"><xsl:text>VideoStereoModeType</xsl:text></xsl:when>
-                <xsl:when test="contains(@path,'\TrackEntry\Video\')"><xsl:text>Video</xsl:text><xsl:value-of select="@name"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="@name"/></xsl:otherwise>
-            </xsl:choose>
-            <xsl:text>;&#10;&#10;</xsl:text>
+                <xsl:text>;&#10;&#10;</xsl:text>
+            </xsl:if>
         </xsl:if>
     </xsl:template>
 
