@@ -63,10 +63,70 @@
 
   </xsl:template>
 
+    <!-- TODO remove this and list all the known elements in the EBML Schema -->
+    <xsl:template name="discardNewElement">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/@name='LanguageIETF'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='GammaValue'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='OldStereoMode'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackJoinBlocks'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChannelPositions'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='DefaultDecodedFieldDuration'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CodecSettings'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackOffset'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackOverlay'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickTrackUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickTrackSegmentUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickMasterTrackSegmentUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickTrackFlag'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrickMasterTrackUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='BlockAdditionMapping'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TrackTranslate'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TagEditionUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TagLanguageIETF'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='TagBinary'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='PrevFilename'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='PrevUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='NextFilename'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='NextUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='SegmentFamily'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='SegmentFilename'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterTranslate'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CueCodecState'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='CueReference'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='BlockVirtual'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ReferencePriority'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ReferenceVirtual'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='Slices'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ReferenceFrame'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='EncryptedBlock'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='SilentTracks'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapLanguageIETF'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterStringUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterSegmentUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterSegmentEditionUID'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapProcess'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='ChapterTrack'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='FileUsedStartTime'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='FileUsedEndTime'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='FileReferral'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='AttachmentLink'"><xsl:text>y</xsl:text></xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="ebml:element">
-        <xsl:call-template name="parsePath">
-            <xsl:with-param name="node" select="."/>
-        </xsl:call-template>
+        <xsl:variable name="isDiscarded">
+            <xsl:call-template name="discardNewElement">
+                <xsl:with-param name="node" select="."/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:if test="$isDiscarded=''">
+            <xsl:call-template name="parsePath">
+                <xsl:with-param name="node" select="."/>
+            </xsl:call-template>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="parsePath">
