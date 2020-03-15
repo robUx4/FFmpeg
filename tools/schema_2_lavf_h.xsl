@@ -42,7 +42,9 @@
  */
 </xsl:text>
 
-    <xsl:apply-templates select="ebml:element[@name='Segment']"/>
+    <xsl:call-template name="parsePath">
+        <xsl:with-param name="node" select="ebml:element[@name='Segment']"/>
+    </xsl:call-template>
     <!-- TODO even closer ordering with a "sort score"  https://stackoverflow.com/questions/1287651/xslt-custom-sort -->
 
     <xsl:for-each select="ebml:element">
@@ -68,6 +70,7 @@
     <!-- TODO remove this and list all the known elements in the EBML Schema -->
     <xsl:template name="discardNewElement">
         <xsl:param name="node"/>
+
         <xsl:choose>
             <xsl:when test="$node/@name='LanguageIETF'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='GammaValue'"><xsl:text>y</xsl:text></xsl:when>
@@ -114,6 +117,7 @@
             <xsl:when test="$node/@name='FileUsedEndTime'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='FileReferral'"><xsl:text>y</xsl:text></xsl:when>
             <xsl:when test="$node/@name='AttachmentLink'"><xsl:text>y</xsl:text></xsl:when>
+            <xsl:when test="$node/@name='SegmentFamily'"><xsl:text>y</xsl:text></xsl:when>
         </xsl:choose>
     </xsl:template>
 
@@ -140,30 +144,19 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="ebml:element">
-        <xsl:variable name="isDiscarded">
-            <xsl:call-template name="discardNewElement">
-                <xsl:with-param name="node" select="."/>
-            </xsl:call-template>
-        </xsl:variable>
-
-        <xsl:if test="$isDiscarded=''">
-            <xsl:call-template name="parsePath">
-                <xsl:with-param name="node" select="."/>
-            </xsl:call-template>
-        </xsl:if>
-    </xsl:template>
-
     <xsl:template name="parsePath">
         <xsl:param name="node"/>
+
+<!-- <xsl:value-of select="$node/@name"/><xsl:text>/</xsl:text><xsl:value-of select="$node/@type"/> -->
+
         <xsl:variable name="plainPath">
             <xsl:value-of select="translate($node/@path, '\+', '\')" />
         </xsl:variable>
 
         <!-- Master element comment header -->
-        <xsl:if test="@type='master'">
+        <xsl:if test="$node/@type='master'">
             <xsl:choose>
-                <xsl:when test="@name='Segment'">
+                <xsl:when test="$node/@name='Segment'">
                     <xsl:text>
 /* toplevel segment */
 #define MATROSKA_ID_SEGMENT    0x18538067
@@ -190,6 +183,7 @@
             </xsl:choose>
         </xsl:if>
 
+        <!-- Output each child ID -->
         <xsl:for-each select="/ebml:EBMLSchema/ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
             <xsl:sort select="not(@name='Info')" />
             <xsl:sort select="not(@name='Tracks')" />
@@ -199,88 +193,23 @@
             <xsl:sort select="@name='Audio'" />
             <xsl:sort select="string-length(@id)" />
             <xsl:sort select="@id" />
-            <xsl:variable name="lavfName">
-                <!-- Transform the ebml_matroska.xml name into the libavformat name -->
-                <xsl:choose>
-                    <xsl:when test="@name='FileDescription'"><xsl:text>FileDesc</xsl:text></xsl:when>
-                    <xsl:when test="@name='ChapLanguage'"><xsl:text>ChapLang</xsl:text></xsl:when>
-                    <xsl:when test="@name='ReferenceBlock'"><xsl:text>BlockReference</xsl:text></xsl:when>
-                    <xsl:when test="@name='Position'"><xsl:text>ClusterPosition</xsl:text></xsl:when>
-                    <xsl:when test="@name='PrevSize'"><xsl:text>ClusterPrevSize</xsl:text></xsl:when>
-                    <xsl:when test="@name='Timestamp'"><xsl:text>ClusterTimecode</xsl:text></xsl:when>
-                    <xsl:when test="@name='CuePoint'"><xsl:text>PointEntry</xsl:text></xsl:when>
-                    <xsl:when test="@name='CueTrackPositions'"><xsl:text>CueTrackPosition</xsl:text></xsl:when>
-                    <xsl:when test="@name='TimestampScale'"><xsl:text>TimecodeScale</xsl:text></xsl:when>
-                    <xsl:when test="@name='Seek'"><xsl:text>SeekEntry</xsl:text></xsl:when>
-                    <xsl:when test="@name='TagLanguage'"><xsl:text>TagLang</xsl:text></xsl:when>
-                    <xsl:when test="@name='Targets'"><xsl:text>TagTargets</xsl:text></xsl:when>
-                    <xsl:when test="@name='TagAttachmentUID'"><xsl:text>TagTargets_AttachUID</xsl:text></xsl:when>
-                    <xsl:when test="@name='TagChapterUID'"><xsl:text>TagTargets_ChapterUID</xsl:text></xsl:when>
-                    <xsl:when test="@name='TagTrackUID'"><xsl:text>TagTargets_TrackUID</xsl:text></xsl:when>
-                    <xsl:when test="@name='TargetType'"><xsl:text>TagTargets_Type</xsl:text></xsl:when>
-                    <xsl:when test="@name='TargetTypeValue'"><xsl:text>TagTargets_TypeValue</xsl:text></xsl:when>
-                    <xsl:when test="@name='ChapterPhysicalEquiv'"><xsl:text>ChapterPhysEquiv</xsl:text></xsl:when>
-                    <xsl:when test="@name='OutputSamplingFrequency'"><xsl:text>AudioOutSamplingFreq</xsl:text></xsl:when>
-                    <xsl:when test="@name='SamplingFrequency'"><xsl:text>AudioSamplingFreq</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncodings'"><xsl:text>TrackContentEncodings</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncoding'"><xsl:text>TrackContentEncoding</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentCompression'"><xsl:text>EncodingCompression</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentCompAlgo'"><xsl:text>EncodingCompAlgo</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentCompSettings'"><xsl:text>EncodingCompSettings</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncodingOrder'"><xsl:text>EncodingOrder</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncodingScope'"><xsl:text>EncodingScope</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncodingType'"><xsl:text>EncodingType</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncryption'"><xsl:text>EncodingEncryption</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncAESSettings'"><xsl:text>EncodingEncAESSettings</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncAlgo'"><xsl:text>EncodingEncAlgo</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentEncKeyID'"><xsl:text>EncodingEncKeyId</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentSigAlgo'"><xsl:text>EncodingSigAlgo</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentSignature'"><xsl:text>EncodingSignature</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentSigKeyID'"><xsl:text>EncodingSigKeyId</xsl:text></xsl:when>
-                    <xsl:when test="@name='ContentSigHashAlgo'"><xsl:text>EncodingSigHashAlgo</xsl:text></xsl:when>
-                    <xsl:when test="@name='MaxBlockAdditionID'"><xsl:text>TrackMaxBlkAddID</xsl:text></xsl:when>
-                    <xsl:when test="@name='SeekPreRoll'"><xsl:text>SeekPreRoll</xsl:text></xsl:when>
-                    <xsl:when test="@name='TrackTimestampScale'"><xsl:text>TrackTimecodeScale</xsl:text></xsl:when>
-                    <xsl:when test="@name='AspectRatioType'"><xsl:text>VideoAspectRatio</xsl:text></xsl:when>
-                    <xsl:when test="@name='Colour'"><xsl:text>VideoColor</xsl:text></xsl:when>
-                    <xsl:when test="@name='ColourSpace'"><xsl:text>VideoColorSpace</xsl:text></xsl:when>
-                    <xsl:when test="@name='ChromaSubsamplingHorz'"><xsl:text>VideoColorChromaSubHorz</xsl:text></xsl:when>
-                    <xsl:when test="@name='ChromaSubsamplingVert'"><xsl:text>VideoColorChromaSubVert</xsl:text></xsl:when>
-                    <xsl:when test="@name='CbSubsamplingHorz'"><xsl:text>VideoColorCbSubHorz</xsl:text></xsl:when>
-                    <xsl:when test="@name='CbSubsamplingVert'"><xsl:text>VideoColorCbSubVert</xsl:text></xsl:when>
-                    <xsl:when test="@name='MasteringMetadata'"><xsl:text>VideoColorMasteringMeta</xsl:text></xsl:when>
-                    <xsl:when test="@name='MatrixCoefficients'"><xsl:text>VideoColorMatrixCoeff</xsl:text></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Audio\')"><xsl:text>Audio</xsl:text><xsl:value-of select="@name"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\PixelCrop')"><xsl:text>VideoPixelCrop</xsl:text><xsl:value-of select="substring(@name, 10, 1)"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\Colour\MasteringMetadata\Primary')"><xsl:text>VideoColor_</xsl:text><xsl:value-of select="substring(@name, 8, 1)"/><xsl:value-of select="substring(@name, string-length(@name))"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\Colour\MasteringMetadata\WhitePointChromaticity')"><xsl:text>VideoColor_WHITE</xsl:text><xsl:value-of select="substring(@name, string-length(@name))"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\Colour\MasteringMetadata\Luminance')"><xsl:text>VideoColor_</xsl:text><xsl:value-of select="@name"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\Colour\')"><xsl:text>VideoColor</xsl:text><xsl:value-of select="@name"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\Video\')"><xsl:text>Video</xsl:text><xsl:value-of select="@name"/></xsl:when>
-                    <xsl:when test="contains(@path,'\TrackEntry\') and not(contains(@name,'Track')) and not(contains(@name,'Codec'))"><xsl:text>Track</xsl:text><xsl:value-of select="@name"/></xsl:when>
-                    <xsl:otherwise><xsl:value-of select="@name"/></xsl:otherwise>
-                </xsl:choose>
+
+            <xsl:variable name="isDiscarded">
+                <xsl:call-template name="discardNewElement">
+                    <xsl:with-param name="node" select="."/>
+                </xsl:call-template>
             </xsl:variable>
-            <xsl:variable name="lavfNameUpper">
-                <xsl:value-of select="translate($lavfName, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
-            </xsl:variable>
-            <xsl:text>#define MATROSKA_ID_</xsl:text>
-            <xsl:choose>
-                <xsl:when test="string-length($lavfNameUpper) &lt; 25">
-                    <xsl:value-of select="substring(concat($lavfNameUpper, '                          '),0,25)"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="$lavfNameUpper"/>
-                </xsl:otherwise>
-            </xsl:choose>
-            <xsl:text>  </xsl:text>
-            <xsl:value-of select="@id"/>
-            <xsl:text>&#10;</xsl:text>
-            <!-- <xsl:if test="@name='TagDefault'"><xsl:text>#define MATROSKA_ID_TAGDEFAULT_BUG            0x44B4 // old bogus tag value&#10;</xsl:text></xsl:if> -->
+
+            <xsl:if test="$isDiscarded=''">
+                <xsl:call-template name="outputNodeID">
+                    <xsl:with-param name="node" select="."/>
+                </xsl:call-template>
+            </xsl:if>
         </xsl:for-each>
         <xsl:text>&#10;</xsl:text>
 
-        <xsl:for-each select="../ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
+        <!-- Output elements from child masters -->
+        <xsl:for-each select="/ebml:EBMLSchema/ebml:element[translate(@path, '\+', '\') = concat(concat($plainPath, '\'), @name)]">
             <xsl:sort select="not(@name='Info')" />
             <xsl:sort select="not(@name='Tracks')" />
             <xsl:sort select="not(@name='Cues')" />
@@ -289,12 +218,105 @@
             <xsl:sort select="@name='Audio'" />
             <xsl:sort select="@name" />
             <xsl:if test="@type='master'">
-                <xsl:call-template name="parsePath">
-                    <xsl:with-param name="node" select="."/>
-                </xsl:call-template>
+                <xsl:variable name="isDiscarded">
+                    <xsl:call-template name="discardNewElement">
+                        <xsl:with-param name="node" select="."/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+<!-- <xsl:value-of select="@name"/><xsl:text>/</xsl:text><xsl:value-of select="@type"/> -->
+
+                <xsl:if test="$isDiscarded=''">
+                    <xsl:call-template name="parsePath">
+                        <xsl:with-param name="node" select="."/>
+                    </xsl:call-template>
+                </xsl:if>
             </xsl:if>
         </xsl:for-each>
 
+    </xsl:template>
+
+    <xsl:template name="outputNodeID">
+        <xsl:param name="node"/>
+
+        <xsl:variable name="lavfName">
+            <!-- Transform the ebml_matroska.xml name into the libavformat name -->
+            <xsl:choose>
+                <xsl:when test="$node/@name='FileDescription'"><xsl:text>FileDesc</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ChapLanguage'"><xsl:text>ChapLang</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ReferenceBlock'"><xsl:text>BlockReference</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='Position'"><xsl:text>ClusterPosition</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='PrevSize'"><xsl:text>ClusterPrevSize</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='Timestamp'"><xsl:text>ClusterTimecode</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='CuePoint'"><xsl:text>PointEntry</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='CueTrackPositions'"><xsl:text>CueTrackPosition</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TimestampScale'"><xsl:text>TimecodeScale</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='Seek'"><xsl:text>SeekEntry</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TagLanguage'"><xsl:text>TagLang</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='Targets'"><xsl:text>TagTargets</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TagAttachmentUID'"><xsl:text>TagTargets_AttachUID</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TagChapterUID'"><xsl:text>TagTargets_ChapterUID</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TagTrackUID'"><xsl:text>TagTargets_TrackUID</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TargetType'"><xsl:text>TagTargets_Type</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TargetTypeValue'"><xsl:text>TagTargets_TypeValue</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ChapterPhysicalEquiv'"><xsl:text>ChapterPhysEquiv</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='OutputSamplingFrequency'"><xsl:text>AudioOutSamplingFreq</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='SamplingFrequency'"><xsl:text>AudioSamplingFreq</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncodings'"><xsl:text>TrackContentEncodings</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncoding'"><xsl:text>TrackContentEncoding</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentCompression'"><xsl:text>EncodingCompression</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentCompAlgo'"><xsl:text>EncodingCompAlgo</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentCompSettings'"><xsl:text>EncodingCompSettings</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncodingOrder'"><xsl:text>EncodingOrder</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncodingScope'"><xsl:text>EncodingScope</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncodingType'"><xsl:text>EncodingType</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncryption'"><xsl:text>EncodingEncryption</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncAESSettings'"><xsl:text>EncodingEncAESSettings</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncAlgo'"><xsl:text>EncodingEncAlgo</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentEncKeyID'"><xsl:text>EncodingEncKeyId</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentSigAlgo'"><xsl:text>EncodingSigAlgo</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentSignature'"><xsl:text>EncodingSignature</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentSigKeyID'"><xsl:text>EncodingSigKeyId</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ContentSigHashAlgo'"><xsl:text>EncodingSigHashAlgo</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='MaxBlockAdditionID'"><xsl:text>TrackMaxBlkAddID</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='SeekPreRoll'"><xsl:text>SeekPreRoll</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='TrackTimestampScale'"><xsl:text>TrackTimecodeScale</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='AspectRatioType'"><xsl:text>VideoAspectRatio</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='Colour'"><xsl:text>VideoColor</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ColourSpace'"><xsl:text>VideoColorSpace</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ChromaSubsamplingHorz'"><xsl:text>VideoColorChromaSubHorz</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='ChromaSubsamplingVert'"><xsl:text>VideoColorChromaSubVert</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='CbSubsamplingHorz'"><xsl:text>VideoColorCbSubHorz</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='CbSubsamplingVert'"><xsl:text>VideoColorCbSubVert</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='MasteringMetadata'"><xsl:text>VideoColorMasteringMeta</xsl:text></xsl:when>
+                <xsl:when test="$node/@name='MatrixCoefficients'"><xsl:text>VideoColorMatrixCoeff</xsl:text></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\Audio\')"><xsl:text>Audio</xsl:text><xsl:value-of select="$node/@name"/></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\Video\PixelCrop')"><xsl:text>VideoPixelCrop</xsl:text><xsl:value-of select="substring($node/@name, 10, 1)"/></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\Video\Colour\MasteringMetadata\Primary')"><xsl:text>VideoColor_</xsl:text><xsl:value-of select="substring($node/@name, 8, 1)"/><xsl:value-of select="substring($node/@name, string-length($node/@name))"/></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\Video\Colour\MasteringMetadata\WhitePointChromaticity')"><xsl:text>VideoColor_WHITE</xsl:text><xsl:value-of select="substring($node/@name, string-length($node/@name))"/></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\Video\Colour\MasteringMetadata\Luminance')"><xsl:text>VideoColor_</xsl:text><xsl:value-of select="$node/@name"/></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\Video\Colour\')"><xsl:text>VideoColor</xsl:text><xsl:value-of select="$node/@name"/></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\Video\')"><xsl:text>Video</xsl:text><xsl:value-of select="$node/@name"/></xsl:when>
+                <xsl:when test="contains($node/@path,'\TrackEntry\') and not(contains($node/@name,'Track')) and not(contains($node/@name,'Codec'))"><xsl:text>Track</xsl:text><xsl:value-of select="$node/@name"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$node/@name"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="lavfNameUpper">
+            <xsl:value-of select="translate($lavfName, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+        </xsl:variable>
+
+        <xsl:text>#define MATROSKA_ID_</xsl:text>
+        <xsl:choose>
+            <xsl:when test="string-length($lavfNameUpper) &lt; 25">
+                <xsl:value-of select="substring(concat($lavfNameUpper, '                          '),0,25)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$lavfNameUpper"/>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>  </xsl:text>
+        <xsl:value-of select="$node/@id"/>
+        <xsl:text>&#10;</xsl:text>
     </xsl:template>
 
     <xsl:template name="ConvertDecToHex">
