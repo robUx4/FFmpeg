@@ -117,6 +117,7 @@ typedef struct mkv_track {
     int64_t         duration_offset;
     int64_t         codecpriv_offset;
     int64_t         ts_offset;
+    float           time_scale;
 } mkv_track;
 
 #define MODE_MATROSKAv2 0x01
@@ -1147,6 +1148,9 @@ static int mkv_write_track(AVFormatContext *s, MatroskaMuxContext *mkv,
     put_ebml_uid (pb, MATROSKA_ID_TRACKUID,    track->uid);
     put_ebml_uint(pb, MATROSKA_ID_TRACKFLAGLACING, 0);    // no lacing (yet)
 
+    if (track->time_scale != 1.0f)
+        put_ebml_float(pb, MATROSKA_ID_TRACKTIMECODESCALE, track->time_scale);
+
     if ((tag = av_dict_get(st->metadata, "title", NULL, 0)))
         put_ebml_string(pb, MATROSKA_ID_TRACKNAME, tag->value);
     tag = av_dict_get(st->metadata, "language", NULL, 0);
@@ -2087,10 +2091,15 @@ static int mkv_write_block(AVFormatContext *s, AVIOContext *pb,
         blockid = MATROSKA_ID_BLOCK;
     }
 
+    int64_t scaled_ts = ts - mkv->cluster_pts;
+    if (track->time_scale != 1.0f)
+        scaled_ts = roundf((float) scaled_ts / track->time_scale);
+    assert(scaled_ts < 0xFFFF);
+
     put_ebml_id(pb, blockid);
     put_ebml_length(pb, size + track->track_num_size + 3, 0);
     put_ebml_num(pb, track_number, track->track_num_size);
-    avio_wb16(pb, ts - mkv->cluster_pts);
+    avio_wb16(pb, scaled_ts);
     avio_w8(pb, (blockid == MATROSKA_ID_SIMPLEBLOCK && keyframe) ? (1 << 7) : 0);
     avio_write(pb, data + offset, size);
     if (data != pkt->data)
@@ -2716,6 +2725,7 @@ static int mkv_init(struct AVFormatContext *s)
 
         // ms precision is the de-facto standard timescale for mkv files
         avpriv_set_pts_info(st, 64, mkv->timestamp_scale.num, mkv->timestamp_scale.den);
+        track->time_scale = 1.0f;
 
         if (st->codecpar->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
             if (mkv->mode == MODE_WEBM) {
