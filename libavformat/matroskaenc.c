@@ -139,6 +139,8 @@ typedef struct MatroskaMuxContext {
     mkv_cues            cues;
     int64_t             cues_pos;
 
+    AVRational          timestamp_scale;
+
     AVPacket            cur_audio_pkt;
 
     unsigned            nb_attachments;
@@ -1829,7 +1831,9 @@ static int mkv_write_header(AVFormatContext *s)
         return ret;
     pb = mkv->info.bc;
 
-    put_ebml_uint(pb, MATROSKA_ID_TIMECODESCALE, 1000000);
+    uint64_t rounded_scale = ((MATROSKA_TICKS * mkv->timestamp_scale.num) + mkv->timestamp_scale.den / 2) /
+                             mkv->timestamp_scale.den;
+    put_ebml_uint(pb, MATROSKA_ID_TIMECODESCALE, rounded_scale);
     if ((tag = av_dict_get(s->metadata, "title", NULL, 0)))
         put_ebml_string(pb, MATROSKA_ID_TITLE, tag->value);
     if (!(s->flags & AVFMT_FLAG_BITEXACT)) {
@@ -2699,6 +2703,7 @@ static int mkv_init(struct AVFormatContext *s)
             mkv->segment_uid[i] = av_lfg_get(&c);
     }
 
+    mkv->timestamp_scale = (AVRational){1, 1000};
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st = s->streams[i];
         mkv_track *track = &mkv->tracks[i];
@@ -2710,7 +2715,7 @@ static int mkv_init(struct AVFormatContext *s)
         }
 
         // ms precision is the de-facto standard timescale for mkv files
-        avpriv_set_pts_info(st, 64, 1, 1000);
+        avpriv_set_pts_info(st, 64, mkv->timestamp_scale.num, mkv->timestamp_scale.den);
 
         if (st->codecpar->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
             if (mkv->mode == MODE_WEBM) {
