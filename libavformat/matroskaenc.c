@@ -58,6 +58,8 @@
  * Info, Tracks, Chapters, Attachments, Tags (potentially twice) and Cues */
 #define MAX_SEEKHEAD_ENTRIES 7
 
+#define MATROSKA_TICKS 1000000000LL // 1 ns precision
+
 #define IS_SEEKABLE(pb, mkv) (((pb)->seekable & AVIO_SEEKABLE_NORMAL) && \
                               !(mkv)->is_live)
 
@@ -1219,10 +1221,10 @@ static int mkv_write_track(AVFormatContext *s, MatroskaMuxContext *mkv,
 
         if(   st->avg_frame_rate.num > 0 && st->avg_frame_rate.den > 0
            && av_cmp_q(av_inv_q(st->avg_frame_rate), st->time_base) > 0)
-            put_ebml_uint(pb, MATROSKA_ID_TRACKDEFAULTDURATION, 1000000000LL * st->avg_frame_rate.den / st->avg_frame_rate.num);
+            put_ebml_uint(pb, MATROSKA_ID_TRACKDEFAULTDURATION, MATROSKA_TICKS * st->avg_frame_rate.den / st->avg_frame_rate.num);
         else if(   st->r_frame_rate.num > 0 && st->r_frame_rate.den > 0
                 && av_cmp_q(av_inv_q(st->r_frame_rate), st->time_base) > 0)
-            put_ebml_uint(pb, MATROSKA_ID_TRACKDEFAULTDURATION, 1000000000LL * st->r_frame_rate.den / st->r_frame_rate.num);
+            put_ebml_uint(pb, MATROSKA_ID_TRACKDEFAULTDURATION, MATROSKA_TICKS * st->r_frame_rate.den / st->r_frame_rate.num);
 
         if (!native_id &&
             ff_codec_get_tag(ff_codec_movvideo_tags, par->codec_id) &&
@@ -1305,7 +1307,7 @@ static int mkv_write_track(AVFormatContext *s, MatroskaMuxContext *mkv,
         if (par->initial_padding && par->codec_id == AV_CODEC_ID_OPUS) {
             int64_t codecdelay = av_rescale_q(par->initial_padding,
                                               (AVRational){ 1, 48000 },
-                                              (AVRational){ 1, 1000000000 });
+                                              (AVRational){ 1, MATROSKA_TICKS });
             if (codecdelay < 0) {
                 av_log(s, AV_LOG_ERROR, "Initial padding is invalid\n");
                 return AVERROR(EINVAL);
@@ -2060,7 +2062,7 @@ static int mkv_write_block(AVFormatContext *s, AVIOContext *pb,
     if (side_data && side_data_size >= 10) {
         discard_padding = av_rescale_q(AV_RL32(side_data + 4),
                                        (AVRational){1, par->sample_rate},
-                                       (AVRational){1, 1000000000});
+                                       (AVRational){1, MATROSKA_TICKS});
     }
 
     side_data = av_packet_get_side_data(pkt,
