@@ -161,6 +161,7 @@ typedef struct MatroskaMuxContext {
     int                 allow_raw_vfw;
     int                 flipped_raw_rgb;
     int                 default_mode;
+    int                 sample_accurate;
 
     uint32_t            segment_uid[4];
 } MatroskaMuxContext;
@@ -2725,7 +2726,24 @@ static int mkv_init(struct AVFormatContext *s)
 
         // ms precision is the de-facto standard timescale for mkv files
         avpriv_set_pts_info(st, 64, mkv->timestamp_scale.num, mkv->timestamp_scale.den);
-        track->time_scale = 1.0f;
+        if (mkv->sample_accurate && mkv->mode != MODE_WEBM) {
+            switch (st->codecpar->codec_type) {
+            case AVMEDIA_TYPE_VIDEO:
+                track->time_scale = (float) (mkv->timestamp_scale.den * st->r_frame_rate.den) /
+                                    (float) (mkv->timestamp_scale.num * st->r_frame_rate.num);
+                break;
+            case AVMEDIA_TYPE_AUDIO:
+                track->time_scale = (float) (mkv->timestamp_scale.den) /
+                                    (float) (mkv->timestamp_scale.num * st->codecpar->sample_rate);
+                track->time_scale *= 8.0f; // TODO adjust to the codec packing size
+                break;
+            default:
+                track->time_scale = 1.0f;
+                break;
+            }
+        } else {
+            track->time_scale = 1.0f;
+        }
 
         if (st->codecpar->codec_type == AVMEDIA_TYPE_ATTACHMENT) {
             if (mkv->mode == MODE_WEBM) {
@@ -2812,6 +2830,7 @@ static const AVOption options[] = {
     { "infer", "For each track type, mark the first track of disposition default as default; if none exists, mark the first track as default.", 0, AV_OPT_TYPE_CONST, { .i64 = DEFAULT_MODE_INFER }, 0, 0, FLAGS, "default_mode" },
     { "infer_no_subs", "For each track type, mark the first track of disposition default as default; for audio and video: if none exists, mark the first track as default.", 0, AV_OPT_TYPE_CONST, { .i64 = DEFAULT_MODE_INFER_NO_SUBS }, 0, 0, FLAGS, "default_mode" },
     { "passthrough", "Use the disposition flag as-is", 0, AV_OPT_TYPE_CONST, { .i64 = DEFAULT_MODE_PASSTHROUGH }, 0, 0, FLAGS, "default_mode" },
+    { "sample_accurate", "Use timescale for each track to get more accurate sample timestamps", OFFSET(sample_accurate), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
     { NULL },
 };
 
